@@ -1,0 +1,71 @@
+name: Update gold price
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  update-price:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Fetch and parse price
+        shell: python
+        run: |
+          import json, re, requests
+          from datetime import datetime, timezone
+
+          def digits(s):
+              return s.translate(str.maketrans("۰۱۲۳۴۵۶۷۸۹٬", "0123456789,"))
+
+          def extract(text):
+              text = re.sub(r"<[^>]+>", " ", text)
+              text = text.replace("&nbsp;", " ")
+              patterns = [
+                  r"گرم\s*۱۸\s*تهران\s*[:：-]?\s*([۰-۹\d][۰-۹\d,٬\s]{5,})",
+                  r"قیمت\s*(?:هر|یک)?\s*گرم[^۰-۹\d]{0,60}([۰-۹\d][۰-۹\d,٬\s]{5,})"
+              ]
+              for pat in patterns:
+                  m = re.search(pat, text, re.I)
+                  if m:
+                      n = re.sub(r"\D", "", digits(m.group(1)))
+                      if 1000000 <= int(n) <= 100000000:
+                          return int(n)
+              return None
+
+          headers={"User-Agent":"Mozilla/5.0 (compatible; GariKarbaba/1.0)"}
+          sources=[
+              "https://tabangohar.com/?utm_source=app-nerkh&utm_medium=cpc&utm_campaign=tabangoharsite&utm_term=linkpaein#gram",
+              "https://t.me/s/talaclinic1"
+          ]
+          price=None
+          used=None
+          for url in sources:
+              try:
+                  r=requests.get(url,headers=headers,timeout=25)
+                  r.raise_for_status()
+                  price=extract(r.text)
+                  if price:
+                      used="Tabangohar" if "tabangohar.com" in url else "Tabangohar official Telegram"
+                      break
+              except Exception as e:
+                  print("Source failed:", url, e)
+
+          if not price:
+              print("No valid gold price found; keeping previous value.")
+              raise SystemExit(0)
+
+          data={"ok":True,"price":price,"updatedAt":datetime.now(timezone.utc).isoformat(),"source":used}
+          with open("price.json","w",encoding="utf-8") as f:
+              json.dump(data,f,ensure_ascii=False,indent=2)
+          print(data)
+      - name: Commit updated price
+        run: |
+          git config user.name "gari-karbaba-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add price.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Update gold price"
+          git push
