@@ -23,7 +23,7 @@
 <header class="header"><div class="logo">گ</div><h1>گاری کهربا</h1><div class="sub">محاسبه‌گر حرفه‌ای قیمت طلا</div></header>
 <section class="card">
 <div class="row"><label for="price">قیمت هر گرم طلا</label><input id="price" class="input num" inputmode="decimal" type="number" min="0" step="1000" value="23835000"></div>
-<div class="unit">تومان / گرم ۱۸ عیار</div><div class="pricebox"><div class="source">قیمت قابل ویرایش است و روی گوشی ذخیره می‌شود.</div><button class="btn goldbtn" id="sourceBtn">تابان گوهر</button></div>
+<div class="unit">تومان / گرم ۱۸ عیار</div><div class="pricebox"><div class="source" id="priceStatus">در حال دریافت قیمت از تابان گوهر...</div><button class="btn goldbtn" id="refreshPrice">↻ به‌روزرسانی</button></div><div class="pricebox" style="margin-top:8px"><div class="source">قیمت را می‌توانید دستی هم تغییر دهید.</div><button class="btn darkbtn" id="sourceBtn">تابان گوهر</button></div>
 <button class="btn install" id="install">نصب روی صفحه اصلی</button></section>
 <section class="card">
 <div class="row"><label for="weight">وزن طلا</label><input id="weight" class="input num" inputmode="decimal" type="number" min="0.01" max="1000" step="0.01" placeholder="مثلاً 2.50"></div><div class="unit">گرم — ۰٫۰۱ تا ۱۰۰۰</div>
@@ -42,7 +42,26 @@ fields.forEach(id=>$(id).addEventListener("input",calculate));
 $("clear").onclick=()=>{["weight","making","profit"].forEach(id=>$(id).value="");calculate();$("status").textContent="وزن، اجرت و سود پاک شدند."};
 $("save").onclick=()=>{calculate();$("status").textContent="اطلاعات با موفقیت ذخیره شد."};
 $("sourceBtn").onclick=()=>window.open("https://tabangohar.com/","_blank","noopener");
+async function refreshPrice(){
+  const st=$("priceStatus");
+  st.textContent="در حال دریافت قیمت...";
+  try{
+    const r=await fetch("./price.json?t="+Date.now(),{cache:"no-store"});
+    const d=await r.json();
+    if(d.ok && Number(d.price)>0){
+      $("price").value=d.price;
+      const when=d.updatedAt?new Date(d.updatedAt).toLocaleString("fa-IR"):"";
+      st.textContent="قیمت خودکار: "+fmt(d.price)+" تومان"+(when?" • "+when:"");
+      calculate();
+    }else{
+      st.textContent="دریافت خودکار موقتاً در دسترس نیست؛ قیمت را دستی وارد کنید.";
+    }
+  }catch(e){
+    st.textContent="اتصال به قیمت خودکار برقرار نشد؛ قیمت را دستی وارد کنید.";
+  }
+}
+$("refreshPrice").onclick=refreshPrice;
 let deferredPrompt=null;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("install").style.display="block"});
 $("install").onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("install").style.display="none"}};
-if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));load();
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));load();setTimeout(refreshPrice,250);
 </script></body></html>
