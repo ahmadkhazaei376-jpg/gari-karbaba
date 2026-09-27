@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2f261a">
+<link rel="manifest" href="manifest.webmanifest">
+<title>گاری کهربا | محاسبه‌گر طلا</title>
+<style>
+:root{--bg:#f7f3ea;--card:#fffdf8;--ink:#2f261a;--gold:#c9a227;--gold2:#f2df9b;--muted:#7d7468;--danger:#9d2c2c;--line:#e8dfcf}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#fffaf0,#f2ede3 70%);font-family:Tahoma,Arial,sans-serif;color:var(--ink)}
+.app{max-width:520px;margin:auto;min-height:100vh;padding:18px 14px 30px}.header{background:linear-gradient(145deg,#2f261a,#4a3922);color:#fff;border-radius:24px;padding:22px 18px;text-align:center;box-shadow:0 12px 35px #2f261a20}
+.logo{width:70px;height:70px;margin:0 auto 8px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold2);font-weight:900;font-size:25px}h1{margin:0;font-size:25px}.sub{margin-top:7px;color:#eadfbf;font-size:12px}
+.card{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 7px 24px #2f261a0c}.row{display:grid;grid-template-columns:1fr 1.25fr;gap:10px;align-items:center;margin-bottom:12px}label{font-size:13px;font-weight:700}
+.input{width:100%;border:1px solid #d9cfbd;background:#fff;border-radius:13px;padding:13px 12px;font-size:17px;font-weight:700;color:var(--ink);outline:none}.input:focus{border-color:var(--gold);box-shadow:0 0 0 3px #c9a22722}.unit{font-size:11px;color:var(--muted);margin-top:-7px;margin-bottom:10px}
+.pricebox{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center}.source{font-size:11px;color:var(--muted)}.btn{border:0;border-radius:13px;padding:12px 14px;font-family:inherit;font-weight:800;cursor:pointer}.goldbtn{background:var(--gold);color:#20190f}.darkbtn{background:var(--ink);color:#fff}.clearbtn{background:#f6e3e3;color:var(--danger)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.install{display:none;margin-top:10px;width:100%;background:var(--gold);color:#20190f}.result{margin-top:15px;border-radius:18px;background:linear-gradient(145deg,#f8e8aa,#fff8df);border:1px solid #e4ca70;padding:17px}
+.resultline{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed #d9c78d;font-size:13px}.resultline:last-child{border:0;padding-bottom:0}.final{font-size:21px;font-weight:900}.num{font-variant-numeric:tabular-nums}.status{margin-top:10px;font-size:11px;color:var(--muted);line-height:1.8}.note{font-size:11px;color:var(--muted);line-height:1.9;margin:0}.footer{text-align:center;color:var(--muted);font-size:10px;padding:18px}
+@media(max-width:380px){.row{grid-template-columns:1fr}.actions{grid-template-columns:1fr}}
+</style>
+</head>
+<body><div class="app">
+<header class="header"><div class="logo">گ</div><h1>گاری کهربا</h1><div class="sub">محاسبه‌گر حرفه‌ای قیمت طلا</div></header>
+<section class="card">
+<div class="row"><label for="price">قیمت هر گرم طلا</label><input id="price" class="input num" inputmode="decimal" type="number" min="0" step="1000" value="23835000"></div>
+<div class="unit">تومان / گرم ۱۸ عیار</div><div class="pricebox"><div class="source">قیمت قابل ویرایش است و روی گوشی ذخیره می‌شود.</div><button class="btn goldbtn" id="sourceBtn">تابان گوهر</button></div>
+<button class="btn install" id="install">نصب روی صفحه اصلی</button></section>
+<section class="card">
+<div class="row"><label for="weight">وزن طلا</label><input id="weight" class="input num" inputmode="decimal" type="number" min="0.01" max="1000" step="0.01" placeholder="مثلاً 2.50"></div><div class="unit">گرم — ۰٫۰۱ تا ۱۰۰۰</div>
+<div class="row"><label for="making">اجرت</label><input id="making" class="input num" inputmode="decimal" type="number" min="0" max="100" step="0.01" placeholder="۰ تا ۱۰۰"></div><div class="unit">درصد — ۰ تا ۱۰۰٪</div>
+<div class="row"><label for="profit">سود</label><input id="profit" class="input num" inputmode="decimal" type="number" min="0" max="7" step="0.01" placeholder="۰ تا ۷"></div><div class="unit">درصد — ۰ تا ۷٪</div>
+<div class="actions"><button class="btn clearbtn" id="clear">پاک کردن</button><button class="btn darkbtn" id="save">ذخیره اطلاعات</button></div></section>
+<section class="result"><div class="resultline"><span>قیمت خام</span><strong id="raw" class="num">۰ تومان</strong></div><div class="resultline"><span>مبلغ اجرت</span><strong id="makingAmount" class="num">۰ تومان</strong></div><div class="resultline"><span>مبلغ سود</span><strong id="profitAmount" class="num">۰ تومان</strong></div><div class="resultline"><span>قیمت نهایی</span><strong id="final" class="final num">۰ تومان</strong></div></section>
+<section class="card"><p class="note"><b>فرمول:</b> قیمت خام = قیمت هر گرم × وزن؛ اجرت = قیمت خام × درصد اجرت؛ سود = (قیمت خام + اجرت) × درصد سود؛ قیمت نهایی = مجموع سه مورد.</p><div id="status" class="status">اطلاعات روی همین گوشی ذخیره می‌شود.</div></section>
+<div class="footer">گاری کهربا • PWA • قابل استفاده روی موبایل</div></div>
+<script>
+const $=id=>document.getElementById(id),fields=["price","weight","making","profit"];
+const fmt=n=>new Intl.NumberFormat("fa-IR",{maximumFractionDigits:0}).format(Math.round(Number(n)||0));
+function calculate(){const p=Number($("price").value)||0,w=Number($("weight").value)||0,m=Number($("making").value)||0,s=Number($("profit").value)||0;const raw=p*w,ma=raw*m/100,pa=(raw+ma)*s/100,total=raw+ma+pa;$("raw").textContent=fmt(raw)+" تومان";$("makingAmount").textContent=fmt(ma)+" تومان";$("profitAmount").textContent=fmt(pa)+" تومان";$("final").textContent=fmt(total)+" تومان";localStorage.setItem("gariKarbaba",JSON.stringify({price:p,weight:w,making:m,profit:s}))}
+function load(){try{const x=JSON.parse(localStorage.getItem("gariKarbaba"));if(x)fields.forEach(k=>{if(x[k]!==undefined)$(k).value=x[k]})}catch(e){}calculate()}
+fields.forEach(id=>$(id).addEventListener("input",calculate));
+$("clear").onclick=()=>{["weight","making","profit"].forEach(id=>$(id).value="");calculate();$("status").textContent="وزن، اجرت و سود پاک شدند."};
+$("save").onclick=()=>{calculate();$("status").textContent="اطلاعات با موفقیت ذخیره شد."};
+$("sourceBtn").onclick=()=>window.open("https://tabangohar.com/","_blank","noopener");
+let deferredPrompt=null;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("install").style.display="block"});
+$("install").onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("install").style.display="none"}};
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));load();
+</script></body></html>
