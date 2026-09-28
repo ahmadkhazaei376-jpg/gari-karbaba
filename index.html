@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#2f261a">
 <link rel="manifest" href="manifest.webmanifest">
-<title>گاری کهربا | محاسبه‌گر طلا</title>
+<title>گالری کهربا | محاسبه‌گر طلا</title>
 <style>
 :root{--bg:#f7f3ea;--card:#fffdf8;--ink:#2f261a;--gold:#c9a227;--gold2:#f2df9b;--muted:#7d7468;--danger:#9d2c2c;--line:#e8dfcf}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#fffaf0,#f2ede3 70%);font-family:Tahoma,Arial,sans-serif;color:var(--ink)}
@@ -20,7 +20,7 @@
 </style>
 </head>
 <body><div class="app">
-<header class="header"><div class="logo">گ</div><h1>گاری کهربا</h1><div class="sub">محاسبه‌گر حرفه‌ای قیمت طلا</div></header>
+<header class="header"><div class="logo">گ</div><h1>گالری کهربا</h1><div class="sub">محاسبه‌گر حرفه‌ای قیمت طلا</div></header>
 <section class="card">
 <div class="row"><label for="price">قیمت هر گرم طلا</label><input id="price" class="input num" inputmode="decimal" type="number" min="0" step="1000" value="23835000"></div>
 <div class="unit">تومان / گرم ۱۸ عیار</div><div class="pricebox"><div class="source" id="priceStatus">در حال دریافت قیمت از تابان گوهر...</div><button class="btn goldbtn" id="refreshPrice">↻ به‌روزرسانی</button></div><div class="pricebox" style="margin-top:8px"><div class="source">قیمت را می‌توانید دستی هم تغییر دهید.</div><button class="btn darkbtn" id="sourceBtn">تابان گوهر</button></div>
@@ -32,7 +32,7 @@
 <div class="actions"><button class="btn clearbtn" id="clear">پاک کردن</button><button class="btn darkbtn" id="save">ذخیره اطلاعات</button></div></section>
 <section class="result"><div class="resultline"><span>قیمت خام</span><strong id="raw" class="num">۰ تومان</strong></div><div class="resultline"><span>مبلغ اجرت</span><strong id="makingAmount" class="num">۰ تومان</strong></div><div class="resultline"><span>مبلغ سود</span><strong id="profitAmount" class="num">۰ تومان</strong></div><div class="resultline"><span>قیمت نهایی</span><strong id="final" class="final num">۰ تومان</strong></div></section>
 <section class="card"><p class="note"><b>فرمول:</b> قیمت خام = قیمت هر گرم × وزن؛ اجرت = قیمت خام × درصد اجرت؛ سود = (قیمت خام + اجرت) × درصد سود؛ قیمت نهایی = مجموع سه مورد.</p><div id="status" class="status">اطلاعات روی همین گوشی ذخیره می‌شود.</div></section>
-<div class="footer">گاری کهربا • PWA • قابل استفاده روی موبایل</div></div>
+<div class="footer">گالری کهربا • PWA • قابل استفاده روی موبایل</div></div>
 <script>
 const $=id=>document.getElementById(id),fields=["price","weight","making","profit"];
 const fmt=n=>new Intl.NumberFormat("fa-IR",{maximumFractionDigits:0}).format(Math.round(Number(n)||0));
