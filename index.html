@@ -9,59 +9,109 @@
 <style>
 :root{--bg:#f7f3ea;--card:#fffdf8;--ink:#2f261a;--gold:#c9a227;--gold2:#f2df9b;--muted:#7d7468;--danger:#9d2c2c;--line:#e8dfcf}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#fffaf0,#f2ede3 70%);font-family:Tahoma,Arial,sans-serif;color:var(--ink)}
-.app{max-width:520px;margin:auto;min-height:100vh;padding:18px 14px 30px}.header{background:linear-gradient(145deg,#2f261a,#4a3922);color:#fff;border-radius:24px;padding:22px 18px;text-align:center;box-shadow:0 12px 35px #2f261a20}
+.app{max-width:560px;margin:auto;min-height:100vh;padding:18px 14px 30px}.header{background:linear-gradient(145deg,#2f261a,#4a3922);color:#fff;border-radius:24px;padding:22px 18px;text-align:center;box-shadow:0 12px 35px #2f261a20}
 .logo{width:70px;height:70px;margin:0 auto 8px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold2);font-weight:900;font-size:25px}h1{margin:0;font-size:25px}.sub{margin-top:7px;color:#eadfbf;font-size:12px}
 .card{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 7px 24px #2f261a0c}.row{display:grid;grid-template-columns:1fr 1.25fr;gap:10px;align-items:center;margin-bottom:12px}label{font-size:13px;font-weight:700}
 .input{width:100%;border:1px solid #d9cfbd;background:#fff;border-radius:13px;padding:13px 12px;font-size:17px;font-weight:700;color:var(--ink);outline:none}.input:focus{border-color:var(--gold);box-shadow:0 0 0 3px #c9a22722}.unit{font-size:11px;color:var(--muted);margin-top:-7px;margin-bottom:10px}
-.pricebox{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center}.source{font-size:11px;color:var(--muted)}.btn{border:0;border-radius:13px;padding:12px 14px;font-family:inherit;font-weight:800;cursor:pointer}.goldbtn{background:var(--gold);color:#20190f}.darkbtn{background:var(--ink);color:#fff}.clearbtn{background:#f6e3e3;color:var(--danger)}
+.pricebox{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center}.source{font-size:11px;color:var(--muted)}.btn{border:0;border-radius:13px;padding:12px 14px;font-family:inherit;font-weight:800;cursor:pointer}.goldbtn{background:var(--gold);color:#20190f}.darkbtn{background:var(--ink);color:#fff}.clearbtn{background:#f6e3e3;color:var(--danger)}.greenbtn{background:#e6f1e5;color:#315b2f}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.install{display:none;margin-top:10px;width:100%;background:var(--gold);color:#20190f}.result{margin-top:15px;border-radius:18px;background:linear-gradient(145deg,#f8e8aa,#fff8df);border:1px solid #e4ca70;padding:17px}
 .resultline{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed #d9c78d;font-size:13px}.resultline:last-child{border:0;padding-bottom:0}.final{font-size:21px;font-weight:900}.num{font-variant-numeric:tabular-nums}.status{margin-top:10px;font-size:11px;color:var(--muted);line-height:1.8}.note{font-size:11px;color:var(--muted);line-height:1.9;margin:0}.footer{text-align:center;color:var(--muted);font-size:10px;padding:18px}
-@media(max-width:380px){.row{grid-template-columns:1fr}.actions{grid-template-columns:1fr}}
+.invoice{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:12px}.invoice h2{text-align:center;margin:0 0 4px;font-size:19px}.invoice .small{text-align:center;color:var(--muted);font-size:11px;margin-bottom:12px}.invline{display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:7px 0;font-size:12px}.invtotal{font-size:18px;font-weight:900;border-bottom:0}.invoice-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+@media(max-width:380px){.row{grid-template-columns:1fr}.actions,.invoice-actions{grid-template-columns:1fr}}
+@media print{body{background:#fff}.app{max-width:none;padding:0}.header,.card:not(.invoice-card),.footer,.no-print{display:none!important}.invoice-card{display:block!important;border:0;box-shadow:none;margin:0}.invoice{border:0}.invoice-actions{display:none!important}}
 </style>
 </head>
 <body><div class="app">
-<header class="header"><div class="logo">گ</div><h1>گالری کهربا</h1><div class="sub">محاسبه‌گر حرفه‌ای قیمت طلا</div></header>
+<header class="header"><div class="logo">ک</div><h1>گالری کهربا</h1><div class="sub">محاسبه‌گر حرفه‌ای قیمت طلا</div></header>
+
 <section class="card">
 <div class="row"><label for="price">قیمت هر گرم طلا</label><input id="price" class="input num" inputmode="decimal" type="number" min="0" step="1000" value="23835000"></div>
-<div class="unit">تومان / گرم ۱۸ عیار</div><div class="pricebox"><div class="source" id="priceStatus">در حال دریافت قیمت از تابان گوهر...</div><button class="btn goldbtn" id="refreshPrice">↻ به‌روزرسانی</button></div><div class="pricebox" style="margin-top:8px"><div class="source">قیمت را می‌توانید دستی هم تغییر دهید.</div><button class="btn darkbtn" id="sourceBtn">تابان گوهر</button></div>
-<button class="btn install" id="install">نصب روی صفحه اصلی</button></section>
+<div class="unit">قیمت پایه گرم ۱۸ عیار — تومان</div>
+<div class="pricebox"><div class="source" id="priceStatus">در حال دریافت قیمت از تابان گوهر...</div><button class="btn goldbtn" id="refreshPrice">↻ به‌روزرسانی</button></div>
+<div class="pricebox" style="margin-top:8px"><div class="source">قیمت را می‌توانید دستی هم تغییر دهید.</div><button class="btn darkbtn" id="sourceBtn">تابان گوهر</button></div>
+<button class="btn install" id="install">نصب روی صفحه اصلی</button>
+</section>
+
 <section class="card">
+<div class="row"><label for="carat">عیار طلا</label><select id="carat" class="input"><option value="18">۱۸ عیار</option><option value="24">۲۴ عیار</option><option value="21">۲۱ عیار</option><option value="22">۲۲ عیار</option><option value="custom">سفارشی</option></select></div>
+<div class="row" id="customCaratRow" style="display:none"><label for="customCarat">عیار سفارشی</label><input id="customCarat" class="input num" type="number" min="1" max="24" step="0.01" placeholder="مثلاً 20"></div>
+<div class="unit">قیمت پایه واردشده ۱۸ عیار است و برای عیار انتخابی تعدیل می‌شود.</div>
 <div class="row"><label for="weight">وزن طلا</label><input id="weight" class="input num" inputmode="decimal" type="number" min="0.01" max="1000" step="0.01" placeholder="مثلاً 2.50"></div><div class="unit">گرم — ۰٫۰۱ تا ۱۰۰۰</div>
 <div class="row"><label for="making">اجرت</label><input id="making" class="input num" inputmode="decimal" type="number" min="0" max="100" step="0.01" placeholder="۰ تا ۱۰۰"></div><div class="unit">درصد — ۰ تا ۱۰۰٪</div>
 <div class="row"><label for="profit">سود</label><input id="profit" class="input num" inputmode="decimal" type="number" min="0" max="7" step="0.01" placeholder="۰ تا ۷"></div><div class="unit">درصد — ۰ تا ۷٪</div>
-<div class="actions"><button class="btn clearbtn" id="clear">پاک کردن</button><button class="btn darkbtn" id="save">ذخیره اطلاعات</button></div></section>
-<section class="result"><div class="resultline"><span>قیمت خام</span><strong id="raw" class="num">۰ تومان</strong></div><div class="resultline"><span>مبلغ اجرت</span><strong id="makingAmount" class="num">۰ تومان</strong></div><div class="resultline"><span>مبلغ سود</span><strong id="profitAmount" class="num">۰ تومان</strong></div><div class="resultline"><span>قیمت نهایی</span><strong id="final" class="final num">۰ تومان</strong></div></section>
-<section class="card"><p class="note"><b>فرمول:</b> قیمت خام = قیمت هر گرم × وزن؛ اجرت = قیمت خام × درصد اجرت؛ سود = (قیمت خام + اجرت) × درصد سود؛ قیمت نهایی = مجموع سه مورد.</p><div id="status" class="status">اطلاعات روی همین گوشی ذخیره می‌شود.</div></section>
+<div class="row"><label for="discount">تخفیف</label><input id="discount" class="input num" inputmode="decimal" type="number" min="0" max="100" step="0.01" placeholder="۰ تا ۱۰۰"></div><div class="unit">درصد تخفیف از مبلغ نهایی</div>
+<div class="actions"><button class="btn clearbtn" id="clear">پاک کردن</button><button class="btn darkbtn" id="save">ذخیره اطلاعات</button></div>
+</section>
+
+<section class="result">
+<div class="resultline"><span>قیمت هر گرم عیار انتخابی</span><strong id="adjustedPrice" class="num">۰ تومان</strong></div>
+<div class="resultline"><span>قیمت خام</span><strong id="raw" class="num">۰ تومان</strong></div>
+<div class="resultline"><span>مبلغ اجرت</span><strong id="makingAmount" class="num">۰ تومان</strong></div>
+<div class="resultline"><span>مبلغ سود</span><strong id="profitAmount" class="num">۰ تومان</strong></div>
+<div class="resultline"><span>مبلغ تخفیف</span><strong id="discountAmount" class="num">۰ تومان</strong></div>
+<div class="resultline"><span>قیمت نهایی</span><strong id="final" class="final num">۰ تومان</strong></div>
+</section>
+
+<section class="card invoice-card">
+<h3 style="margin-top:0">فاکتور حرفه‌ای</h3>
+<div class="row"><label for="customer">نام مشتری</label><input id="customer" class="input" type="text" placeholder="اختیاری"></div>
+<div class="row"><label for="description">شرح کالا</label><input id="description" class="input" type="text" placeholder="مثلاً انگشتر طلا"></div>
+<div class="invoice-actions no-print"><button class="btn greenbtn" id="makeInvoice">صدور فاکتور</button><button class="btn darkbtn" id="shareInvoice">اشتراک‌گذاری</button></div>
+<div id="invoice" class="invoice" style="display:none">
+<h2>گالری کهربا</h2><div class="small">فاکتور فروش طلا و جواهر</div>
+<div class="invline"><span>شماره فاکتور</span><strong id="invNo"></strong></div>
+<div class="invline"><span>تاریخ</span><strong id="invDate"></strong></div>
+<div class="invline"><span>مشتری</span><strong id="invCustomer"></strong></div>
+<div class="invline"><span>شرح کالا</span><strong id="invDesc"></strong></div>
+<div class="invline"><span>عیار</span><strong id="invCarat"></strong></div>
+<div class="invline"><span>وزن</span><strong id="invWeight"></strong></div>
+<div class="invline"><span>اجرت</span><strong id="invMaking"></strong></div>
+<div class="invline"><span>سود</span><strong id="invProfit"></strong></div>
+<div class="invline"><span>تخفیف</span><strong id="invDiscount"></strong></div>
+<div class="invline invtotal"><span>مبلغ قابل پرداخت</span><strong id="invFinal"></strong></div>
+<div class="invoice-actions no-print"><button class="btn goldbtn" id="printInvoice">چاپ فاکتور</button><button class="btn darkbtn" id="closeInvoice">بستن</button></div>
+</div>
+</section>
+
+<section class="card"><p class="note"><b>فرمول:</b> قیمت پایه ۱۸ عیار × ضریب عیار = قیمت گرم انتخابی؛ قیمت خام = قیمت گرم × وزن؛ اجرت و سود طبق درصدهای واردشده محاسبه می‌شوند؛ سپس تخفیف از مبلغ نهایی کسر می‌شود.</p><div id="status" class="status">اطلاعات روی همین گوشی ذخیره می‌شود.</div></section>
 <div class="footer">گالری کهربا • PWA • قابل استفاده روی موبایل</div></div>
+
 <script>
-const $=id=>document.getElementById(id),fields=["price","weight","making","profit"];
+const $=id=>document.getElementById(id);
+const fields=["price","weight","making","profit","discount","carat","customCarat","customer","description"];
 const fmt=n=>new Intl.NumberFormat("fa-IR",{maximumFractionDigits:0}).format(Math.round(Number(n)||0));
-function calculate(){const p=Number($("price").value)||0,w=Number($("weight").value)||0,m=Number($("making").value)||0,s=Number($("profit").value)||0;const raw=p*w,ma=raw*m/100,pa=(raw+ma)*s/100,total=raw+ma+pa;$("raw").textContent=fmt(raw)+" تومان";$("makingAmount").textContent=fmt(ma)+" تومان";$("profitAmount").textContent=fmt(pa)+" تومان";$("final").textContent=fmt(total)+" تومان";localStorage.setItem("gariKarbaba",JSON.stringify({price:p,weight:w,making:m,profit:s}))}
-function load(){try{const x=JSON.parse(localStorage.getItem("gariKarbaba"));if(x)fields.forEach(k=>{if(x[k]!==undefined)$(k).value=x[k]})}catch(e){}calculate()}
+const caratName=c=>c==="custom"?(Number($("customCarat").value)||18)+" عیار":c+" عیار";
+function getCarat(){return $("carat").value==="custom"?(Number($("customCarat").value)||18):Number($("carat").value)||18}
+function calculate(){
+ const p=Number($("price").value)||0,w=Number($("weight").value)||0,m=Number($("making").value)||0,s=Number($("profit").value)||0,d=Number($("discount").value)||0,c=getCarat();
+ const adjusted=p*c/18,raw=adjusted*w,ma=raw*m/100,pa=(raw+ma)*s/100,subtotal=raw+ma+pa,da=subtotal*d/100,total=subtotal-da;
+ $("adjustedPrice").textContent=fmt(adjusted)+" تومان";$("raw").textContent=fmt(raw)+" تومان";$("makingAmount").textContent=fmt(ma)+" تومان";$("profitAmount").textContent=fmt(pa)+" تومان";$("discountAmount").textContent=fmt(da)+" تومان";$("final").textContent=fmt(total)+" تومان";
+ localStorage.setItem("gariKarbaba",JSON.stringify(Object.fromEntries(fields.map(k=>[k,$(k).value]))));
+ return {p,w,m,s,d,c,adjusted,raw,ma,pa,subtotal,da,total};
+}
+function load(){try{const x=JSON.parse(localStorage.getItem("gariKarbaba"));if(x)fields.forEach(k=>{if(x[k]!==undefined)$(k).value=x[k]})}catch(e){}$("customCaratRow").style.display=$("carat").value==="custom"?"grid":"none";calculate()}
 fields.forEach(id=>$(id).addEventListener("input",calculate));
-$("clear").onclick=()=>{["weight","making","profit"].forEach(id=>$(id).value="");calculate();$("status").textContent="وزن، اجرت و سود پاک شدند."};
+$("carat").addEventListener("change",()=>{$("customCaratRow").style.display=$("carat").value==="custom"?"grid":"none";calculate()});
+$("clear").onclick=()=>{["weight","making","profit","discount","customer","description"].forEach(id=>$(id).value="");$("carat").value="18";$("customCaratRow").style.display="none";calculate();$("status").textContent="اطلاعات فروش پاک شدند."};
 $("save").onclick=()=>{calculate();$("status").textContent="اطلاعات با موفقیت ذخیره شد."};
 $("sourceBtn").onclick=()=>window.open("https://tabangohar.com/","_blank","noopener");
 async function refreshPrice(){
-  const st=$("priceStatus");
-  st.textContent="در حال دریافت قیمت...";
-  try{
-    const r=await fetch("./price.json?t="+Date.now(),{cache:"no-store"});
-    const d=await r.json();
-    if(d.ok && Number(d.price)>0){
-      $("price").value=d.price;
-      const when=d.updatedAt?new Date(d.updatedAt).toLocaleString("fa-IR"):"";
-      st.textContent="قیمت خودکار: "+fmt(d.price)+" تومان"+(when?" • "+when:"");
-      calculate();
-    }else{
-      st.textContent="دریافت خودکار موقتاً در دسترس نیست؛ قیمت را دستی وارد کنید.";
-    }
-  }catch(e){
-    st.textContent="اتصال به قیمت خودکار برقرار نشد؛ قیمت را دستی وارد کنید.";
-  }
+ const st=$("priceStatus");st.textContent="در حال دریافت قیمت...";
+ try{const r=await fetch("./price.json?t="+Date.now(),{cache:"no-store"});const d=await r.json();
+ if(d.ok&&Number(d.price)>0){$("price").value=d.price;const when=d.updatedAt?new Date(d.updatedAt).toLocaleString("fa-IR"):"";st.textContent="قیمت خودکار: "+fmt(d.price)+" تومان"+(when?" • "+when:"");calculate()}
+ else st.textContent="دریافت خودکار موقتاً در دسترس نیست؛ قیمت را دستی وارد کنید."
+ }catch(e){st.textContent="اتصال به قیمت خودکار برقرار نشد؛ قیمت را دستی وارد کنید."}
 }
+function invoiceData(){
+ const x=calculate(), now=new Date(), no="GK-"+now.getFullYear()+String(now.getMonth()+1).padStart(2,"0")+String(now.getDate()).padStart(2,"0")+"-"+String(now.getTime()).slice(-5);
+ $("invNo").textContent=no;$("invDate").textContent=now.toLocaleString("fa-IR");$("invCustomer").textContent=$("customer").value||"—";$("invDesc").textContent=$("description").value||"طلا";$("invCarat").textContent=caratName($("carat").value);$("invWeight").textContent=(x.w||0)+" گرم";$("invMaking").textContent=x.m+"٪";$("invProfit").textContent=x.s+"٪";$("invDiscount").textContent=x.d+"٪";$("invFinal").textContent=fmt(x.total)+" تومان";$("invoice").style.display="block";return x}
+$("makeInvoice").onclick=invoiceData;
+$("printInvoice").onclick=()=>window.print();
+$("closeInvoice").onclick=()=>{$("invoice").style.display="none"};
+$("shareInvoice").onclick=async()=>{const x=invoiceData();const text="گالری کهربا\nفاکتور فروش\nمشتری: "+($("customer").value||"—")+"\nشرح: "+($("description").value||"طلا")+"\nعیار: "+caratName($("carat").value)+"\nوزن: "+x.w+" گرم\nمبلغ نهایی: "+fmt(x.total)+" تومان";if(navigator.share){try{await navigator.share({title:"فاکتور گالری کهربا",text})}catch(e){}}else navigator.clipboard?.writeText(text)};
 $("refreshPrice").onclick=refreshPrice;
 let deferredPrompt=null;window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("install").style.display="block"});
 $("install").onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("install").style.display="none"}};
-if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));load();setTimeout(refreshPrice,250);
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+load();setTimeout(refreshPrice,250);
 </script></body></html>
