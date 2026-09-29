@@ -10,7 +10,7 @@
 :root{--bg:#f7f3ea;--card:#fffdf8;--ink:#2f261a;--gold:#c9a227;--gold2:#f2df9b;--muted:#7d7468;--danger:#9d2c2c;--line:#e8dfcf}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#fffaf0,#f2ede3 70%);font-family:Tahoma,Arial,sans-serif;color:var(--ink)}
 .app{max-width:560px;margin:auto;min-height:100vh;padding:18px 14px 30px}.header{background:linear-gradient(145deg,#2f261a,#4a3922);color:#fff;border-radius:24px;padding:22px 18px;text-align:center;box-shadow:0 12px 35px #2f261a20}
-.logo{width:70px;height:70px;margin:0 auto 8px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;color:var(--gold2);font-weight:900;font-size:25px}h1{margin:0;font-size:25px}.sub{margin-top:7px;color:#eadfbf;font-size:12px}
+.logo{width:86px;height:86px;margin:0 auto 8px;display:block;border-radius:50%;object-fit:cover;box-shadow:0 6px 18px #0006}h1{margin:0;font-size:25px}.sub{margin-top:7px;color:#eadfbf;font-size:12px}
 .card{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 7px 24px #2f261a0c}.row{display:grid;grid-template-columns:1fr 1.25fr;gap:10px;align-items:center;margin-bottom:12px}label{font-size:13px;font-weight:700}
 .input{width:100%;border:1px solid #d9cfbd;background:#fff;border-radius:13px;padding:13px 12px;font-size:17px;font-weight:700;color:var(--ink);outline:none}.input:focus{border-color:var(--gold);box-shadow:0 0 0 3px #c9a22722}.unit{font-size:11px;color:var(--muted);margin-top:-7px;margin-bottom:10px}
 .pricebox{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center}.source{font-size:11px;color:var(--muted)}.btn{border:0;border-radius:13px;padding:12px 14px;font-family:inherit;font-weight:800;cursor:pointer}.goldbtn{background:var(--gold);color:#20190f}.darkbtn{background:var(--ink);color:#fff}.clearbtn{background:#f6e3e3;color:var(--danger)}.greenbtn{background:#e6f1e5;color:#315b2f}
@@ -22,8 +22,7 @@
 </style>
 </head>
 <body><div class="app">
-<header class="header"><div class="logo">ک</div><h1>گالری کهربا</h1><div class="sub">محاسبه‌گر حرفه‌ای قیمت طلا</div></header>
-
+<header class="header"><img class="logo" src="icon.svg" alt="لوگوی گالری کهربا"><h1>گالری کهربا</h1><div class="sub">محاسبه‌گر حرفه‌ای قیمت طلا</div></header>
 <section class="card">
 <div class="row"><label for="price">قیمت هر گرم طلا</label><input id="price" class="input num" inputmode="decimal" type="number" min="0" step="1000" value="23835000"></div>
 <div class="unit">قیمت پایه گرم ۱۸ عیار — تومان</div>
@@ -31,7 +30,6 @@
 <div class="pricebox" style="margin-top:8px"><div class="source">قیمت را می‌توانید دستی هم تغییر دهید.</div><button class="btn darkbtn" id="sourceBtn">تابان گوهر</button></div>
 <button class="btn install" id="install">نصب روی صفحه اصلی</button>
 </section>
-
 <section class="card">
 <div class="row"><label for="carat">عیار طلا</label><select id="carat" class="input"><option value="18">۱۸ عیار</option><option value="24">۲۴ عیار</option><option value="21">۲۱ عیار</option><option value="22">۲۲ عیار</option><option value="custom">سفارشی</option></select></div>
 <div class="row" id="customCaratRow" style="display:none"><label for="customCarat">عیار سفارشی</label><input id="customCarat" class="input num" type="number" min="1" max="24" step="0.01" placeholder="مثلاً 20"></div>
@@ -42,7 +40,6 @@
 <div class="row"><label for="discount">تخفیف</label><input id="discount" class="input num" inputmode="decimal" type="number" min="0" max="100" step="0.01" placeholder="۰ تا ۱۰۰"></div><div class="unit">درصد تخفیف از مبلغ نهایی</div>
 <div class="actions"><button class="btn clearbtn" id="clear">پاک کردن</button><button class="btn darkbtn" id="save">ذخیره اطلاعات</button></div>
 </section>
-
 <section class="result">
 <div class="resultline"><span>قیمت هر گرم عیار انتخابی</span><strong id="adjustedPrice" class="num">۰ تومان</strong></div>
 <div class="resultline"><span>قیمت خام</span><strong id="raw" class="num">۰ تومان</strong></div>
@@ -51,7 +48,6 @@
 <div class="resultline"><span>مبلغ تخفیف</span><strong id="discountAmount" class="num">۰ تومان</strong></div>
 <div class="resultline"><span>قیمت نهایی</span><strong id="final" class="final num">۰ تومان</strong></div>
 </section>
-
 <section class="card invoice-card">
 <h3 style="margin-top:0">فاکتور حرفه‌ای</h3>
 <div class="row"><label for="customer">نام مشتری</label><input id="customer" class="input" type="text" placeholder="اختیاری"></div>
@@ -72,10 +68,8 @@
 <div class="invoice-actions no-print"><button class="btn goldbtn" id="printInvoice">چاپ فاکتور</button><button class="btn darkbtn" id="closeInvoice">بستن</button></div>
 </div>
 </section>
-
 <section class="card"><p class="note"><b>فرمول:</b> قیمت پایه ۱۸ عیار × ضریب عیار = قیمت گرم انتخابی؛ قیمت خام = قیمت گرم × وزن؛ اجرت و سود طبق درصدهای واردشده محاسبه می‌شوند؛ سپس تخفیف از مبلغ نهایی کسر می‌شود.</p><div id="status" class="status">اطلاعات روی همین گوشی ذخیره می‌شود.</div></section>
 <div class="footer">گالری کهربا • PWA • قابل استفاده روی موبایل</div></div>
-
 <script>
 const $=id=>document.getElementById(id);
 const fields=["price","weight","making","profit","discount","carat","customCarat","customer","description"];
