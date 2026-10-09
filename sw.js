@@ -1,4 +1,4 @@
-const CACHE = "kahroba-v6-1";
+const CACHE = "kahroba-v6-3";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", e => {
