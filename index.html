@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1c1c1e">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="کهربا">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href='data:application/manifest+json,{"name":"Kahroba Gallery","short_name":"Kahroba","start_url":".","scope":".","display":"standalone","background_color":"%23f7f3ea","theme_color":"%231c1c1e","lang":"fa","dir":"rtl","icons":[{"src":"https://ahmadkhazaei376-jpg.github.io/gari-karbaba/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"},{"src":"https://ahmadkhazaei376-jpg.github.io/gari-karbaba/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"maskable"}]}'>
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>کهربا | گالری طلا — نسخه ۶</title>
 <style>
@@ -602,7 +603,6 @@ function upsertCustomer(name, phone){
   saveCust(c);
   return c[ph];
 }
-/* مانده هر مشتری — همه بر حسب گرم (بدهی طلایی) */
 function custBalance(ph){
   const txs = jget(TX, []).filter(t => t.phone === ph);
   let gold = 0, debt = 0;
@@ -668,7 +668,7 @@ $("ncSave").onclick = () => {
   toast("مشتری ثبت شد ✓");
 };
 
-/* ---------- دفتر طلا و بدهی (همه وزنی) ---------- */
+/* ---------- دفتر طلا و بدهی ---------- */
 $("txPhone").addEventListener("input", () => {
   const ph = normPh($("txPhone").value), c = customers();
   const bal = custBalance(ph);
@@ -882,7 +882,6 @@ function renderFinance(){
   const revenue = invs.reduce((a,o) => a + o.sumPa, 0);
   const expense = exps.reduce((a,e) => a + e.amount, 0);
   const sales = invs.reduce((a,o) => a + o.total, 0);
-  /* جمع وضعیت بدهی همه مشتریان */
   let totalDebt = 0, totalCredit = 0, escrowGold = 0;
   Object.keys(customers()).forEach(k => {
     const b = custBalance(k);
@@ -905,7 +904,6 @@ function renderFinance(){
   $("finReport").innerHTML =
     '<div class="resultline"><span>فروش دوره (' + rName + ')</span><strong>' + fmt(sales) + ' تومان</strong></div>' +
     '<div class="resultline"><span>تعداد فاکتور دوره</span><strong>' + fmt(invs.length) + '</strong></div>';
-  /* ریز بدهی به تفکیک مشتری */
   const c = customers();
   const debtors = Object.keys(c)
     .map(k => ({name: c[k].name, bal: custBalance(k)}))
@@ -1011,9 +1009,6 @@ $("installBtn").onclick = async () => {
   deferredPrompt = null;
   $("installBtn").style.display = "none";
 };
-if("serviceWorker" in navigator){
-  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
-}
 
 /* ---------- شروع ---------- */
 loadState();
