@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1c1c1e">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="کهربا">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -20,7 +21,6 @@ body{margin:0;background:radial-gradient(circle at top,#fffaf0,#f2ede3 70%);font
 .brandSub{font-size:9px;letter-spacing:4px;white-space:nowrap;color:#d9c07a;margin:2px 0 4px;position:relative;z-index:1}
 .badge{display:inline-block;margin-top:8px;background:#c9a22722;border:1px solid #c9a22777;color:#f2df9b;border-radius:99px;padding:4px 12px;font-size:11px;position:relative;z-index:1}
 #installBtn{display:none;margin-top:10px;border:1px solid #f2df9b;background:transparent;color:#f2df9b;border-radius:99px;padding:6px 16px;font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;position:relative;z-index:1}
-/* ---------- تب‌ها ---------- */
 nav.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:12px;position:relative;z-index:1}
 nav.tabs button{border:1px solid #c9a22755;background:#ffffff10;color:#eadfbf;border-radius:12px;padding:8px 2px;font-family:inherit;font-size:10.5px;font-weight:800;cursor:pointer}
 nav.tabs button.on{background:var(--gold);color:#20190f;border-color:var(--gold)}
@@ -247,6 +247,16 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
         <button class="btn clearbtn" id="invClear">🗑️ فاکتور جدید</button>
       </div>
     </section>
+
+    <div class="card">
+      <label style="font-size:14px">💾 پشتیبان‌گیری و انتقال اطلاعات</label>
+      <p class="note" style="margin:8px 0 0">همه اطلاعات برنامه (فاکتورها، مشتریان، دفتر طلا و بدهی، هزینه‌ها، موجودی‌ها و تنظیمات) در یک فایل ذخیره و در هر دستگاه یا نسخه‌ی دیگری بازیابی می‌شود.</p>
+      <div class="actions">
+        <button class="btn goldbtn" id="bkExport">⬇️ دانلود فایل پشتیبان</button>
+        <button class="btn darkbtn" id="bkImportBtn">⬆️ بازیابی از فایل</button>
+      </div>
+      <input type="file" id="bkImport" accept=".json,application/json" style="display:none">
+    </div>
   </section>
 
   <!-- ================= آرشیو ================= -->
@@ -278,7 +288,7 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
   <!-- ================= طلا و بدهی ================= -->
   <section class="panel" id="p-ledger">
     <div class="card">
-      <label style="font-size:14px">⚖️ ثبت تراکنش طلا / بدهی</label>
+      <label style="font-size:14px">⚖️ ثبت تراکنش طلا / بدهی (همه بر حسب گرم)</label>
       <div class="row" style="margin-top:10px">
         <label for="txPhone">موبایل مشتری</label>
         <input id="txPhone" class="input num" type="tel" inputmode="tel" placeholder="09xxxxxxxxx" list="custList2">
@@ -287,14 +297,17 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
       <div class="row">
         <label for="txType">نوع تراکنش</label>
         <select id="txType" class="input">
-          <option value="goldIn">طلای مشتری نزد من (سپرده)</option>
-          <option value="goldOut">تحویل طلا به مشتری (برداشت)</option>
-          <option value="debtAdd">ثبت بدهی مشتری به من</option>
-          <option value="debtPay">دریافت تسویه از مشتری</option>
+          <option value="goldIn">📥 طلای مشتری نزد من (سپرده)</option>
+          <option value="goldOut">📤 تحویل طلا به مشتری (برداشت)</option>
+          <option value="debtAdd">📕 ثبت بدهی مشتری به من (طلا)</option>
+          <option value="debtPay">📗 دریافت تسویه طلا از مشتری</option>
         </select>
       </div>
-      <div class="row" id="txWeightRow"><label for="txWeight">مقدار (گرم)</label><input id="txWeight" class="input num" inputmode="decimal" type="number" min="0" step="0.01" placeholder="مثلاً 5.20"></div>
-      <div class="row" id="txAmountRow" style="display:none"><label for="txAmount">مبلغ (تومان)</label><input id="txAmount" class="input num" inputmode="decimal" type="number" min="0" step="10000" placeholder="مثلاً 5000000"></div>
+      <div class="row">
+        <label for="txWeight">مقدار (گرم)</label>
+        <input id="txWeight" class="input num" inputmode="decimal" type="number" min="0" step="0.01" placeholder="مثلاً 5.20">
+      </div>
+      <div class="unit">برای بدهی، وزن طلایی را بنویسید که مشتری گرفته و باید برگرداند؛ در تسویه، وزن طلای پس‌داده‌شده.</div>
       <div class="row"><label for="txNote">توضیح</label><input id="txNote" class="input" type="text" placeholder="اختیاری"></div>
       <div class="actions"><button class="btn goldbtn" id="txSave">💾 ثبت تراکنش</button></div>
       <div class="unit" id="txCustInfo" style="margin-top:6px"></div>
@@ -321,6 +334,10 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
       </div>
       <div id="finReport"></div>
       <p class="note" style="margin-top:8px"><b>مبنای درآمد:</b> فقط سود فاکتورها درآمد محسوب می‌شود؛ اصل پول طلا صرف خرید مجدد می‌گردد.</p>
+    </div>
+    <div class="card">
+      <label style="font-size:14px">📕 وضعیت بدهی مشتریان (بر حسب گرم)</label>
+      <div id="debtReport" style="margin-top:10px"></div>
     </div>
     <div class="card">
       <label style="font-size:14px">⚙️ موجودی اولیه مغازه</label>
@@ -376,7 +393,6 @@ const fmtFa = n => new Intl.NumberFormat("fa-IR", {maximumFractionDigits: 2}).fo
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2600);}
 function jdate(ts){try{return new Intl.DateTimeFormat("fa-IR",{dateStyle:"short",timeStyle:"short"}).format(new Date(ts));}catch(e){return new Date(ts).toLocaleString();}}
 function dbg(t){$("rawResp").textContent = t;}
-function setMsg(html){$("fetchStatus")?0:0;}
 async function copyText(txt, msg){
   try{ await navigator.clipboard.writeText(txt); toast(msg); }
   catch(e){
@@ -603,8 +619,8 @@ function custBalance(ph){
   txs.forEach(t => {
     if(t.type === "goldIn") gold += t.weight;
     if(t.type === "goldOut") gold -= t.weight;
-    if(t.type === "debtAdd") debt += t.amount;
-    if(t.type === "debtPay") debt -= t.amount;
+    if(t.type === "debtAdd") debt += t.weight;
+    if(t.type === "debtPay") debt -= t.weight;
   });
   return {gold: gold, debt: debt};
 }
@@ -629,8 +645,8 @@ function renderCustList(){
       '<div class="custTop"><span>👤 ' + cu.name + '</span><span>' + cu.points + ' امتیاز</span></div>' +
       '<div class="custMeta">📱 ' + fa2en(cu.phone) + ' — ' + cu.purchases.length + ' خرید — جمع خرید: ' + fmt(cu.purchases.reduce((a,x) => a + x.total, 0)) + ' تومان</div>' +
       (bal.gold > 0.001 ? '<div class="custMeta" style="color:#8a6d1a">⚖️ طلای نزد شما: ' + fmtFa(bal.gold) + ' گرم</div>' : '') +
-      (bal.debt > 0.5 ? '<div class="custMeta" style="color:#9d2c2c">📕 بدهکار: ' + fmt(bal.debt) + ' تومان</div>' : '') +
-      (bal.debt < -0.5 ? '<div class="custMeta" style="color:#2e7d4f">📗 بستانکار: ' + fmt(-bal.debt) + ' تومان</div>' : '') +
+      (bal.debt > 0.001 ? '<div class="custMeta" style="color:#9d2c2c">📕 بدهکار: ' + fmtFa(bal.debt) + ' گرم طلا</div>' : '') +
+      (bal.debt < -0.001 ? '<div class="custMeta" style="color:#2e7d4f">📗 بستانکار: ' + fmtFa(-bal.debt) + ' گرم طلا</div>' : '') +
       '<div class="arcBtns"><button class="btn darkbtn cHist">🧾 سابقه خرید</button><button class="btn clearbtn cDel">🗑️ حذف</button></div>' +
       '<div class="cDetail" style="display:none"></div>';
     el.querySelector(".cHist").onclick = () => {
@@ -645,7 +661,8 @@ function renderCustList(){
     el.querySelector(".cDel").onclick = () => {
       if(confirm("مشتری «" + cu.name + "» و سابقه‌اش حذف شود؟ (تراکنش‌های دفتر طلا باقی می‌مانند)")){
         const cc = customers(); delete cc[k]; saveCust(cc);
-        renderCustList(); renderCustDatalists(); toast("مشتری حذف شد");
+        renderCustList(); renderCustDatalists(); renderFinance();
+        toast("مشتری حذف شد");
       }
     };
     div.appendChild(el);
@@ -657,22 +674,16 @@ $("ncSave").onclick = () => {
   if(!n || p.length < 10){ toast("نام و شماره موبایل معتبر (۱۱ رقمی) لازم است"); return; }
   upsertCustomer(n, p);
   $("ncName").value = ""; $("ncPhone").value = "";
-  renderCustList(); renderCustDatalists();
+  renderCustList(); renderCustDatalists(); renderFinance();
   toast("مشتری ثبت شد ✓");
 };
 
 /* ---------- دفتر طلا و بدهی ---------- */
-function updateTxFields(){
-  const t = $("txType").value;
-  $("txWeightRow").style.display = (t === "goldIn" || t === "goldOut") ? "grid" : "none";
-  $("txAmountRow").style.display = (t === "debtAdd" || t === "debtPay") ? "grid" : "none";
-}
-$("txType").addEventListener("change", updateTxFields);
 $("txPhone").addEventListener("input", () => {
   const ph = normPh($("txPhone").value), c = customers();
   const bal = custBalance(ph);
   $("txCustInfo").textContent = c[ph]
-    ? (c[ph].name + " — طلای نزد شما: " + fmtFa(bal.gold) + " گرم — بدهی: " + fmt(Math.max(0, bal.debt)) + " تومان")
+    ? (c[ph].name + " — طلای نزد شما: " + fmtFa(bal.gold) + " گرم — بدهی طلا: " + fmtFa(Math.max(0, bal.debt)) + " گرم")
     : "";
 });
 $("txSave").onclick = () => {
@@ -680,24 +691,18 @@ $("txSave").onclick = () => {
   if(ph.length < 10){ toast("اول موبایل مشتری را وارد کنید"); return; }
   const c = customers();
   if(!c[ph]){ toast("این شماره در باشگاه مشتریان نیست — اول از تب مشتریان اضافه کنید"); return; }
-  const t = $("txType").value;
-  const tx = {id: Date.now(), ts: Date.now(), phone: ph, type: t, note: $("txNote").value.trim()};
-  if(t === "goldIn" || t === "goldOut"){
-    tx.weight = parseNum($("txWeight").value);
-    if(tx.weight <= 0){ toast("مقدار وزن را وارد کنید"); return; }
-  } else {
-    tx.amount = parseNum($("txAmount").value);
-    if(tx.amount <= 0){ toast("مبلغ را وارد کنید"); return; }
-  }
+  const tx = {id: Date.now(), ts: Date.now(), phone: ph, type: $("txType").value, note: $("txNote").value.trim()};
+  tx.weight = parseNum($("txWeight").value);
+  if(tx.weight <= 0){ toast("مقدار وزن (گرم) را وارد کنید"); return; }
   const arr = jget(TX, []);
   arr.push(tx);
   jset(TX, arr);
-  ["txWeight","txAmount","txNote"].forEach(id => $(id).value = "");
+  ["txWeight","txNote"].forEach(id => $(id).value = "");
   $("txCustInfo").textContent = "";
-  renderTxList(); renderCustList();
+  renderTxList(); renderCustList(); renderFinance();
   toast("تراکنش ثبت شد ✓");
 };
-const TX_LABEL = {goldIn: "📥 سپرده طلا", goldOut: "📤 برداشت طلا", debtAdd: "📕 ثبت بدهی", debtPay: "📗 تسویه بدهی"};
+const TX_LABEL = {goldIn: "📥 سپرده طلا", goldOut: "📤 برداشت طلا", debtAdd: "📕 بدهی طلا", debtPay: "📗 تسویه طلا"};
 function renderTxList(){
   const arr = jget(TX, []).slice().reverse().slice(0, 30);
   const div = $("txList");
@@ -707,15 +712,14 @@ function renderTxList(){
   arr.forEach(t => {
     const el = document.createElement("div");
     el.className = "txItem";
-    const val = (t.type === "goldIn" || t.type === "goldOut") ? fmtFa(t.weight) + " گرم" : fmt(t.amount) + " تومان";
     el.innerHTML =
-      '<div class="txTop"><span>' + TX_LABEL[t.type] + ' — ' + ((c[t.phone] || {}).name || t.phone) + '</span><span>' + val + '</span></div>' +
+      '<div class="txTop"><span>' + TX_LABEL[t.type] + ' — ' + ((c[t.phone] || {}).name || t.phone) + '</span><span>' + fmtFa(t.weight) + ' گرم</span></div>' +
       '<div class="txMeta">' + jdate(t.ts) + (t.note ? ' — ' + t.note : '') + '</div>';
     div.appendChild(el);
   });
 }
 $("txWipe").onclick = () => {
-  if(confirm("کل دفتر طلا و بدهی پاک شود؟ برگشت‌پذیر نیست.")){ jset(TX, []); renderTxList(); renderCustList(); toast("دفتر پاک شد"); }
+  if(confirm("کل دفتر طلا و بدهی پاک شود؟ برگشت‌پذیر نیست.")){ jset(TX, []); renderTxList(); renderCustList(); renderFinance(); toast("دفتر پاک شد"); }
 };
 
 /* ---------- فاکتور ---------- */
@@ -748,6 +752,7 @@ function invoiceTextFromObj(o){
   let t = "🧾 فاکتور — گالری کهربا\n" +
     "مشتری: " + o.customer + "\n" +
     "تاریخ: " + jdate(o.ts) + "\n" +
+    "نرخ روز هر گرم ۱۸ عیار: " + fmt(o.price) + " تومان\n" +
     "--------------\n";
   o.items.forEach(x => {
     t += x.name + " — " + fmtFa(x.wGram) + " گرم — اجرت " + fmtFa(x.m) + "٪ — سود " + fmtFa(x.s) + "٪ — " + fmt(x.total) + " تومان\n";
@@ -766,7 +771,7 @@ function printObj(o){
   $("printArea").innerHTML =
     '<div style="text-align:center">' + LOGO_SVG.replace('width="260" height="84"','width="200" height="65"') + '</div>' +
     '<h2 style="margin:0 0 4px">فاکتور فروش طلا</h2>' +
-    '<div class="ph">' + jdate(o.ts) + '</div>' +
+    '<div class="ph">' + jdate(o.ts) + ' — نرخ روز هر گرم: ' + fmt(o.price) + ' تومان</div>' +
     '<table>' +
     '<tr><td>مشتری</td><td>' + o.customer + '</td></tr>' +
     (o.phone ? '<tr><td>موبایل</td><td>' + fa2en(o.phone) + '</td></tr>' : '') +
@@ -802,7 +807,6 @@ $("invClear").onclick = () => {
   calculate();
   toast("فاکتور جدید آماده شد");
 };
-/* تشخیص مشتری هنگام تایپ موبایل */
 $("cPhone").addEventListener("input", () => {
   const ph = normPh($("cPhone").value), c = customers();
   if(c[ph]){
@@ -824,7 +828,7 @@ function renderArchive(){
     div.className = "arcItem";
     div.innerHTML =
       '<div class="arcTop"><span>👤 ' + o.customer + '</span><span>' + fmt(o.total) + ' تومان</span></div>' +
-      '<div class="arcMeta">' + jdate(o.ts) + ' — ' + o.items.length + ' قلم — سود: ' + fmt(o.sumPa) + ' تومان</div>' +
+      '<div class="arcMeta">' + jdate(o.ts) + ' — ' + o.items.length + ' قلم — سود: ' + fmt(o.sumPa) + ' تومان — نرخ روز: ' + fmt(o.price) + '</div>' +
       '<div class="arcBtns">' +
       '<button class="btn goldbtn aPrint">🖨️ چاپ</button>' +
       '<button class="btn okbtn aShare">⚡ ارسال</button>' +
@@ -854,7 +858,6 @@ $("invArchive").onclick = () => {
   const a = jget(ARC, []);
   a.push(o);
   jset(ARC, a);
-  /* باشگاه مشتریان */
   if(o.phone){
     const c = customers();
     if(!c[o.phone]) c[o.phone] = {name: o.customer, phone: o.phone, created: Date.now(), purchases: [], points: 0};
@@ -889,13 +892,21 @@ function renderFinance(){
   const revenue = invs.reduce((a,o) => a + o.sumPa, 0);
   const expense = exps.reduce((a,e) => a + e.amount, 0);
   const sales = invs.reduce((a,o) => a + o.total, 0);
-  const escrowGold = Object.keys(customers()).reduce((a,k) => a + custBalance(k).gold, 0);
+  let totalDebt = 0, totalCredit = 0, escrowGold = 0;
+  Object.keys(customers()).forEach(k => {
+    const b = custBalance(k);
+    if(b.debt > 0) totalDebt += b.debt;
+    if(b.debt < 0) totalCredit += -b.debt;
+    escrowGold += b.gold;
+  });
   const cash = (fin.cash0 || 0) + jget(ARC, []).reduce((a,o) => a + o.total, 0) - jget(EXP, []).reduce((a,e) => a + e.amount, 0);
   const gold = (fin.gold0 || 0) - sold;
   $("finDash").innerHTML =
     '<div class="dashBox"><div class="v">' + fmtFa(gold) + '</div><div class="l">موجودی طلا (گرم)</div></div>' +
     '<div class="dashBox"><div class="v">' + fmt(cash) + '</div><div class="l">مانده صندوق (تومان)</div></div>' +
-    '<div class="dashBox"><div class="v">' + fmtFa(escrowGold) + '</div><div class="l">طلای امانی مشتریان</div></div>' +
+    '<div class="dashBox"><div class="v">' + fmtFa(escrowGold) + '</div><div class="l">طلای امانی مشتریان (گرم)</div></div>' +
+    '<div class="dashBox"><div class="v" style="color:#9d2c2c">' + fmtFa(totalDebt) + '</div><div class="l">بدهی طلا مشتریان (گرم)</div></div>' +
+    '<div class="dashBox"><div class="v" style="color:#2e7d4f">' + fmtFa(totalCredit) + '</div><div class="l">بستانکاری مشتریان (گرم)</div></div>' +
     '<div class="dashBox"><div class="v">' + fmt(revenue) + '</div><div class="l">درآمد (سود) دوره</div></div>' +
     '<div class="dashBox"><div class="v">' + fmt(expense) + '</div><div class="l">هزینه‌های دوره</div></div>' +
     '<div class="dashBox"><div class="v">' + fmt(revenue - expense) + '</div><div class="l">سود خالص دوره</div></div>';
@@ -903,6 +914,22 @@ function renderFinance(){
   $("finReport").innerHTML =
     '<div class="resultline"><span>فروش دوره (' + rName + ')</span><strong>' + fmt(sales) + ' تومان</strong></div>' +
     '<div class="resultline"><span>تعداد فاکتور دوره</span><strong>' + fmt(invs.length) + '</strong></div>';
+  const c = customers();
+  const debtors = Object.keys(c)
+    .map(k => ({name: c[k].name, bal: custBalance(k)}))
+    .filter(x => Math.abs(x.bal.debt) > 0.001 || x.bal.gold > 0.001);
+  if(!debtors.length){
+    $("debtReport").innerHTML = '<p class="note">بدهی یا امانی ثبت‌شده‌ای وجود ندارد.</p>';
+  } else {
+    $("debtReport").innerHTML = debtors.map(x =>
+      '<div class="resultline"><span>👤 ' + x.name + '</span><strong>' +
+      (Math.abs(x.bal.debt) > 0.001
+        ? (x.bal.debt > 0 ? '📕 ' + fmtFa(x.bal.debt) + ' گرم بدهکار' : '📗 ' + fmtFa(-x.bal.debt) + ' گرم بستانکار')
+        : '') +
+      (x.bal.gold > 0.001 ? (Math.abs(x.bal.debt) > 0.001 ? ' — ' : '') + '⚖️ ' + fmtFa(x.bal.gold) + ' گرم امانی' : '') +
+      '</strong></div>'
+    ).join("");
+  }
 }
 document.querySelectorAll("#rangeChips button").forEach(b => b.onclick = () => {
   document.querySelectorAll("#rangeChips button").forEach(x => x.classList.remove("on"));
@@ -943,6 +970,46 @@ $("expWipe").onclick = () => {
   if(confirm("همه هزینه‌ها پاک شود؟")){ jset(EXP, []); renderExpList(); renderFinance(); toast("هزینه‌ها پاک شد"); }
 };
 
+/* ---------- پشتیبان‌گیری و بازیابی ---------- */
+const BK_KEYS = [STORE, STORE + "_meta", STORE + "_apikey", STORE + "_auto", STORE + "_dbg", ARC, CUST, TX, EXP, FIN];
+$("bkExport").onclick = () => {
+  const data = {app: "kahroba", ver: 6, ts: Date.now(), data: {}};
+  BK_KEYS.forEach(k => {
+    const v = localStorage.getItem(k);
+    if(v !== null) data.data[k] = v;
+  });
+  const blob = new Blob([JSON.stringify(data, null, 1)], {type: "application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "kahroba-backup-" + new Date().toISOString().slice(0, 10) + ".json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  toast("فایل پشتیبان دانلود شد ✓");
+};
+$("bkImportBtn").onclick = () => $("bkImport").click();
+$("bkImport").addEventListener("change", e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const j = JSON.parse(reader.result);
+      if(!j || j.app !== "kahroba" || !j.data){ toast("این فایل پشتیبان کهربا نیست"); return; }
+      const keys = Object.keys(j.data);
+      if(!keys.length){ toast("فایل پشتیبان خالی است"); return; }
+      if(!confirm(keys.length + " بخش اطلاعات بازیابی شود؟ اطلاعات فعلی همین دستگاه جایگزین می‌شود.")) return;
+      keys.forEach(k => localStorage.setItem(k, j.data[k]));
+      toast("اطلاعات بازیابی شد — صفحه تازه‌سازی می‌شود ✓");
+      setTimeout(() => location.reload(), 1200);
+    }catch(err){
+      toast("فایل خوانده نشد — فرمت نامعتبر است");
+    }
+  };
+  reader.readAsText(f);
+  e.target.value = "";
+});
+
 /* ---------- رویدادها ---------- */
 $("addItem").onclick = () => { addItemRow(); calculate(); };
 ["price","taxRate"].forEach(id => $(id).addEventListener("input", calculate));
@@ -970,7 +1037,7 @@ $("saveKey").onclick = () => {
 };
 $("copyRaw").onclick = () => copyText($("rawResp").textContent, "پاسخ خام کپی شد ✓");
 $("copy").onclick = () => {
-  let t = "گالری کهربا — محاسبه طلا\n";
+  let t = "گالری کهربا — محاسبه طلا\nنرخ روز: " + $("price").value + " تومان\n";
   calc.items.forEach(x => { t += x.name + " (" + fmtFa(x.wGram) + " گرم، اجرت " + fmtFa(x.m) + "٪، سود " + fmtFa(x.s) + "٪): " + fmt(x.total) + " تومان\n"; });
   if($("taxOn").checked) t += "مالیات: " + $("taxAmount").textContent + "\n";
   t += "قیمت نهایی: " + $("final").textContent;
@@ -993,12 +1060,13 @@ $("installBtn").onclick = async () => {
   $("installBtn").style.display = "none";
 };
 if("serviceWorker" in navigator){
-  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
 }
 
 /* ---------- شروع ---------- */
 loadState();
-updateTxFields();
 calculate();
 setupAuto();
 renderArchive();
