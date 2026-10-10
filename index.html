@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="کهربا">
-<link rel="manifest" href='data:application/manifest+json,{"name":"Kahroba Gallery","short_name":"Kahroba","start_url":".","scope":".","display":"standalone","background_color":"%23f7f3ea","theme_color":"%231c1c1e","lang":"fa","dir":"rtl","icons":[{"src":"https://ahmadkhazaei376-jpg.github.io/gari-karbaba/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"},{"src":"https://ahmadkhazaei376-jpg.github.io/gari-karbaba/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"maskable"}]}'>
+<link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>کهربا | گالری طلا — نسخه ۶</title>
 <style>
@@ -1009,6 +1009,14 @@ $("installBtn").onclick = async () => {
   deferredPrompt = null;
   $("installBtn").style.display = "none";
 };
+/* ثبت سرویس‌ورکر — شرط لازم برای گزینه Install در کروم */
+if("serviceWorker" in navigator){
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js")
+      .then(() => console.log("SW ثبت شد"))
+      .catch(e => console.log("SW خطا:", e));
+  });
+}
 
 /* ---------- شروع ---------- */
 loadState();
