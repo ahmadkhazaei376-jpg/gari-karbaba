@@ -247,6 +247,16 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
         <button class="btn clearbtn" id="invClear">🗑️ فاکتور جدید</button>
       </div>
     </section>
+
+    <div class="card">
+      <label style="font-size:14px">💾 پشتیبان‌گیری و انتقال اطلاعات</label>
+      <p class="note" style="margin:8px 0 0">همه اطلاعات برنامه (فاکتورها، مشتریان، دفتر طلا و بدهی، هزینه‌ها، موجودی‌ها و تنظیمات) در یک فایل ذخیره و در هر دستگاه یا نسخه‌ی دیگری بازیابی می‌شود.</p>
+      <div class="actions">
+        <button class="btn goldbtn" id="bkExport">⬇️ دانلود فایل پشتیبان</button>
+        <button class="btn darkbtn" id="bkImportBtn">⬆️ بازیابی از فایل</button>
+      </div>
+      <input type="file" id="bkImport" accept=".json,application/json" style="display:none">
+    </div>
   </section>
 
   <!-- ================= آرشیو ================= -->
@@ -960,6 +970,46 @@ $("expWipe").onclick = () => {
   if(confirm("همه هزینه‌ها پاک شود؟")){ jset(EXP, []); renderExpList(); renderFinance(); toast("هزینه‌ها پاک شد"); }
 };
 
+/* ---------- پشتیبان‌گیری و بازیابی ---------- */
+const BK_KEYS = [STORE, STORE + "_meta", STORE + "_apikey", STORE + "_auto", STORE + "_dbg", ARC, CUST, TX, EXP, FIN];
+$("bkExport").onclick = () => {
+  const data = {app: "kahroba", ver: 6, ts: Date.now(), data: {}};
+  BK_KEYS.forEach(k => {
+    const v = localStorage.getItem(k);
+    if(v !== null) data.data[k] = v;
+  });
+  const blob = new Blob([JSON.stringify(data, null, 1)], {type: "application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "kahroba-backup-" + new Date().toISOString().slice(0, 10) + ".json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  toast("فایل پشتیبان دانلود شد ✓");
+};
+$("bkImportBtn").onclick = () => $("bkImport").click();
+$("bkImport").addEventListener("change", e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const j = JSON.parse(reader.result);
+      if(!j || j.app !== "kahroba" || !j.data){ toast("این فایل پشتیبان کهربا نیست"); return; }
+      const keys = Object.keys(j.data);
+      if(!keys.length){ toast("فایل پشتیبان خالی است"); return; }
+      if(!confirm(keys.length + " بخش اطلاعات بازیابی شود؟ اطلاعات فعلی همین دستگاه جایگزین می‌شود.")) return;
+      keys.forEach(k => localStorage.setItem(k, j.data[k]));
+      toast("اطلاعات بازیابی شد — صفحه تازه‌سازی می‌شود ✓");
+      setTimeout(() => location.reload(), 1200);
+    }catch(err){
+      toast("فایل خوانده نشد — فرمت نامعتبر است");
+    }
+  };
+  reader.readAsText(f);
+  e.target.value = "";
+});
+
 /* ---------- رویدادها ---------- */
 $("addItem").onclick = () => { addItemRow(); calculate(); };
 ["price","taxRate"].forEach(id => $(id).addEventListener("input", calculate));
@@ -1009,12 +1059,9 @@ $("installBtn").onclick = async () => {
   deferredPrompt = null;
   $("installBtn").style.display = "none";
 };
-/* ثبت سرویس‌ورکر — شرط لازم برای گزینه Install در کروم */
 if("serviceWorker" in navigator){
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js")
-      .then(() => console.log("SW ثبت شد"))
-      .catch(e => console.log("SW خطا:", e));
+    navigator.serviceWorker.register("sw.js").catch(() => {});
   });
 }
 
