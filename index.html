@@ -288,7 +288,7 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
   <!-- ================= طلا و بدهی ================= -->
   <section class="panel" id="p-ledger">
     <div class="card">
-      <label style="font-size:14px">⚖️ ثبت تراکنش طلا / بدهی (همه بر حسب گرم)</label>
+      <label style="font-size:14px">⚖️ ثبت تراکنش طلا / بدهی / خرید</label>
       <div class="row" style="margin-top:10px">
         <label for="txPhone">موبایل مشتری</label>
         <input id="txPhone" class="input num" type="tel" inputmode="tel" placeholder="09xxxxxxxxx" list="custList2">
@@ -301,13 +301,21 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
           <option value="goldOut">📤 تحویل طلا به مشتری (برداشت)</option>
           <option value="debtAdd">📕 ثبت بدهی مشتری به من (طلا)</option>
           <option value="debtPay">📗 دریافت تسویه طلا از مشتری</option>
+          <option value="buyGold">🛒 خرید طلا از مشتری</option>
         </select>
       </div>
       <div class="row">
         <label for="txWeight">مقدار (گرم)</label>
         <input id="txWeight" class="input num" inputmode="decimal" type="number" min="0" step="0.01" placeholder="مثلاً 5.20">
       </div>
-      <div class="unit">برای بدهی، وزن طلایی را بنویسید که مشتری گرفته و باید برگرداند؛ در تسویه، وزن طلای پس‌داده‌شده.</div>
+      <div class="row" id="txAmountRow" style="display:none">
+        <label for="txAmount">مبلغ پرداختی (تومان)</label>
+        <input id="txAmount" class="input num" inputmode="decimal" type="number" min="0" step="10000" placeholder="مثلاً 137000000">
+      </div>
+      <div class="actions" id="calcBuyRow" style="display:none">
+        <button class="btn okbtn" id="calcBuyBtn">≈ محاسبه با نرخ روز</button>
+      </div>
+      <div class="unit" id="txHint">برای بدهی، وزن طلایی را بنویسید که مشتری گرفته و باید برگرداند؛ در تسویه، وزن طلای پس‌داده‌شده.</div>
       <div class="row"><label for="txNote">توضیح</label><input id="txNote" class="input" type="text" placeholder="اختیاری"></div>
       <div class="actions"><button class="btn goldbtn" id="txSave">💾 ثبت تراکنش</button></div>
       <div class="unit" id="txCustInfo" style="margin-top:6px"></div>
@@ -344,7 +352,7 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
       <div class="row" style="margin-top:10px"><label for="finGold0">موجودی اولیه طلا (گرم)</label><input id="finGold0" class="input num" inputmode="decimal" type="number" min="0" step="0.01" placeholder="مثلاً 250"></div>
       <div class="row"><label for="finCash0">موجودی اولیه صندوق (تومان)</label><input id="finCash0" class="input num" inputmode="decimal" type="number" min="0" step="100000" placeholder="مثلاً 50000000"></div>
       <div class="actions"><button class="btn okbtn" id="finSaveBase">💾 ثبت موجودی اولیه</button></div>
-      <p class="note" style="margin-top:6px">با هر فاکتور ثبت‌شده، وزن طلا از موجودی کم و مبلغ به صندوق اضافه می‌شود؛ سود فاکتور به درآمد.</p>
+      <p class="note" style="margin-top:6px">با هر فاکتور ثبت‌شده، وزن طلا از موجودی کم و مبلغ به صندوق اضافه می‌شود؛ سود فاکتور به درآمد. با هر خرید از مشتری، وزن به موجودی اضافه و مبلغ از صندوق کم می‌شود.</p>
     </div>
     <div class="card">
       <label style="font-size:14px">➖ ثبت هزینه</label>
@@ -678,7 +686,7 @@ $("ncSave").onclick = () => {
   toast("مشتری ثبت شد ✓");
 };
 
-/* ---------- دفتر طلا و بدهی ---------- */
+/* ---------- دفتر طلا و بدهی / خرید ---------- */
 $("txPhone").addEventListener("input", () => {
   const ph = normPh($("txPhone").value), c = customers();
   const bal = custBalance(ph);
@@ -686,23 +694,44 @@ $("txPhone").addEventListener("input", () => {
     ? (c[ph].name + " — طلای نزد شما: " + fmtFa(bal.gold) + " گرم — بدهی طلا: " + fmtFa(Math.max(0, bal.debt)) + " گرم")
     : "";
 });
+function updateTxFields(){
+  const t = $("txType").value;
+  const isBuy = t === "buyGold";
+  $("txAmountRow").style.display = isBuy ? "grid" : "none";
+  $("calcBuyRow").style.display = isBuy ? "grid" : "none";
+  $("txHint").textContent = isBuy
+    ? "وزن طلای خریداری‌شده از مشتری را وارد کنید و با «محاسبه با نرخ روز» مبلغ پیشنهادی را بگیرید؛ می‌توانید آن را دستی اصلاح کنید."
+    : "برای بدهی، وزن طلایی را بنویسید که مشتری گرفته و باید برگرداند؛ در تسویه، وزن طلای پس‌داده‌شده.";
+}
+$("txType").addEventListener("change", updateTxFields);
+$("calcBuyBtn").onclick = () => {
+  const w = parseNum($("txWeight").value), p = parseNum($("price").value);
+  if(w <= 0 || p <= 0){ toast("اول وزن و قیمت هر گرم را وارد کنید"); return; }
+  $("txAmount").value = Math.round(w * p);
+  toast("مبلغ پیشنهادی: " + fmt(w * p) + " تومان");
+};
 $("txSave").onclick = () => {
   const ph = normPh($("txPhone").value);
   if(ph.length < 10){ toast("اول موبایل مشتری را وارد کنید"); return; }
   const c = customers();
   if(!c[ph]){ toast("این شماره در باشگاه مشتریان نیست — اول از تب مشتریان اضافه کنید"); return; }
-  const tx = {id: Date.now(), ts: Date.now(), phone: ph, type: $("txType").value, note: $("txNote").value.trim()};
+  const t = $("txType").value;
+  const tx = {id: Date.now(), ts: Date.now(), phone: ph, type: t, note: $("txNote").value.trim()};
   tx.weight = parseNum($("txWeight").value);
   if(tx.weight <= 0){ toast("مقدار وزن (گرم) را وارد کنید"); return; }
+  if(t === "buyGold"){
+    tx.amount = parseNum($("txAmount").value);
+    if(tx.amount <= 0){ toast("مبلغ پرداختی به مشتری را وارد کنید (یا با نرخ روز محاسبه کنید)"); return; }
+  }
   const arr = jget(TX, []);
   arr.push(tx);
   jset(TX, arr);
-  ["txWeight","txNote"].forEach(id => $(id).value = "");
+  ["txWeight","txAmount","txNote"].forEach(id => $(id).value = "");
   $("txCustInfo").textContent = "";
   renderTxList(); renderCustList(); renderFinance();
   toast("تراکنش ثبت شد ✓");
 };
-const TX_LABEL = {goldIn: "📥 سپرده طلا", goldOut: "📤 برداشت طلا", debtAdd: "📕 بدهی طلا", debtPay: "📗 تسویه طلا"};
+const TX_LABEL = {goldIn: "📥 سپرده طلا", goldOut: "📤 برداشت طلا", debtAdd: "📕 بدهی طلا", debtPay: "📗 تسویه طلا", buyGold: "🛒 خرید طلا"};
 function renderTxList(){
   const arr = jget(TX, []).slice().reverse().slice(0, 30);
   const div = $("txList");
@@ -712,8 +741,11 @@ function renderTxList(){
   arr.forEach(t => {
     const el = document.createElement("div");
     el.className = "txItem";
+    const val = t.type === "buyGold"
+      ? (fmtFa(t.weight) + ' گرم — ' + fmt(t.amount) + ' تومان')
+      : fmtFa(t.weight) + ' گرم';
     el.innerHTML =
-      '<div class="txTop"><span>' + TX_LABEL[t.type] + ' — ' + ((c[t.phone] || {}).name || t.phone) + '</span><span>' + fmtFa(t.weight) + ' گرم</span></div>' +
+      '<div class="txTop"><span>' + TX_LABEL[t.type] + ' — ' + ((c[t.phone] || {}).name || t.phone) + '</span><span>' + val + '</span></div>' +
       '<div class="txMeta">' + jdate(t.ts) + (t.note ? ' — ' + t.note : '') + '</div>';
     div.appendChild(el);
   });
@@ -892,6 +924,12 @@ function renderFinance(){
   const revenue = invs.reduce((a,o) => a + o.sumPa, 0);
   const expense = exps.reduce((a,e) => a + e.amount, 0);
   const sales = invs.reduce((a,o) => a + o.total, 0);
+  /* خرید طلا از مشتریان */
+  const txs = jget(TX, []);
+  const buys = txs.filter(t => t.type === "buyGold" && inRange(t.ts));
+  const buyAmount = buys.reduce((a,t) => a + (t.amount || 0), 0);
+  const buyWeight = buys.reduce((a,t) => a + (t.weight || 0), 0);
+  const boughtAll = txs.filter(t => t.type === "buyGold").reduce((a,t) => a + (t.weight || 0), 0);
   let totalDebt = 0, totalCredit = 0, escrowGold = 0;
   Object.keys(customers()).forEach(k => {
     const b = custBalance(k);
@@ -899,11 +937,13 @@ function renderFinance(){
     if(b.debt < 0) totalCredit += -b.debt;
     escrowGold += b.gold;
   });
-  const cash = (fin.cash0 || 0) + jget(ARC, []).reduce((a,o) => a + o.total, 0) - jget(EXP, []).reduce((a,e) => a + e.amount, 0);
-  const gold = (fin.gold0 || 0) - sold;
+  const cash = (fin.cash0 || 0) + jget(ARC, []).reduce((a,o) => a + o.total, 0) - jget(EXP, []).reduce((a,e) => a + e.amount, 0) - txs.filter(t => t.type === "buyGold").reduce((a,t) => a + (t.amount || 0), 0);
+  const gold = (fin.gold0 || 0) - sold + boughtAll;
   $("finDash").innerHTML =
     '<div class="dashBox"><div class="v">' + fmtFa(gold) + '</div><div class="l">موجودی طلا (گرم)</div></div>' +
     '<div class="dashBox"><div class="v">' + fmt(cash) + '</div><div class="l">مانده صندوق (تومان)</div></div>' +
+    '<div class="dashBox"><div class="v" style="color:#8a6d1a">' + fmt(buyAmount) + '</div><div class="l">🛒 خرید طلا از مشتریان (دوره)</div></div>' +
+    '<div class="dashBox"><div class="v">' + fmtFa(buyWeight) + '</div><div class="l">گرم خریداری‌شده (دوره)</div></div>' +
     '<div class="dashBox"><div class="v">' + fmtFa(escrowGold) + '</div><div class="l">طلای امانی مشتریان (گرم)</div></div>' +
     '<div class="dashBox"><div class="v" style="color:#9d2c2c">' + fmtFa(totalDebt) + '</div><div class="l">بدهی طلا مشتریان (گرم)</div></div>' +
     '<div class="dashBox"><div class="v" style="color:#2e7d4f">' + fmtFa(totalCredit) + '</div><div class="l">بستانکاری مشتریان (گرم)</div></div>' +
@@ -913,7 +953,8 @@ function renderFinance(){
   const rName = {today: "امروز", week: "۷ روز اخیر", month: "۳۰ روز اخیر", all: "کل دوره"}[finRange];
   $("finReport").innerHTML =
     '<div class="resultline"><span>فروش دوره (' + rName + ')</span><strong>' + fmt(sales) + ' تومان</strong></div>' +
-    '<div class="resultline"><span>تعداد فاکتور دوره</span><strong>' + fmt(invs.length) + '</strong></div>';
+    '<div class="resultline"><span>تعداد فاکتور دوره</span><strong>' + fmt(invs.length) + '</strong></div>' +
+    '<div class="resultline"><span>🛒 خرید طلا از مشتریان (' + rName + ')</span><strong>' + fmtFa(buyWeight) + ' گرم — ' + fmt(buyAmount) + ' تومان</strong></div>';
   const c = customers();
   const debtors = Object.keys(c)
     .map(k => ({name: c[k].name, bal: custBalance(k)}))
@@ -1067,6 +1108,7 @@ if("serviceWorker" in navigator){
 
 /* ---------- شروع ---------- */
 loadState();
+updateTxFields();
 calculate();
 setupAuto();
 renderArchive();
