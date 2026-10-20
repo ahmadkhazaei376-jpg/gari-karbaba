@@ -89,6 +89,7 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
 .chips button{border:1px solid #d9cfbd;background:#fff;border-radius:99px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
 .chips button.on{background:var(--gold);color:#20190f;border-color:var(--gold)}
+.txDel{border:0;background:#f6e3e3;color:var(--danger);border-radius:10px;padding:6px 10px;font-family:inherit;font-weight:800;font-size:11px;cursor:pointer}
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:14px;font-size:12px;opacity:0;transition:.3s;z-index:9;max-width:90%;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 #printArea{display:none}
@@ -325,6 +326,7 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
         <label style="font-size:14px">📜 آخرین تراکنش‌ها</label>
         <button class="btn clearbtn" id="txWipe" style="padding:7px 12px;font-size:11px">پاک‌کردن دفتر</button>
       </div>
+      <p class="note" style="margin:0 0 8px">تراکنش اشتباه ثبت کردی؟ با دکمه 🗑 کنار هر ردیف آن را حذف کن — مانده‌ها خودکار اصلاح می‌شوند.</p>
       <div id="txList"><p class="note">هنوز تراکنشی ثبت نشده است.</p></div>
     </div>
   </section>
@@ -396,8 +398,9 @@ const LOGO_SVG = document.querySelector(".header svg").outerHTML;
 
 const fa2en = s => String(s).replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
 const parseNum = s => parseFloat(fa2en(String(s)).replace(/[,\s]/g, "")) || 0;
-const fmt = n => new Intl.NumberFormat("fa-IR", {maximumFractionDigits: 0}).format(Math.round(Number(n) || 0));
-const fmtFa = n => new Intl.NumberFormat("fa-IR", {maximumFractionDigits: 2}).format(n);
+const safe = n => { n = Number(n); return isFinite(n) ? n : 0; };
+const fmt = n => new Intl.NumberFormat("fa-IR", {maximumFractionDigits: 0}).format(Math.round(safe(n)));
+const fmtFa = n => new Intl.NumberFormat("fa-IR", {maximumFractionDigits: 2}).format(safe(n));
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2600);}
 function jdate(ts){try{return new Intl.DateTimeFormat("fa-IR",{dateStyle:"short",timeStyle:"short"}).format(new Date(ts));}catch(e){return new Date(ts).toLocaleString();}}
 function dbg(t){$("rawResp").textContent = t;}
@@ -621,16 +624,18 @@ function upsertCustomer(name, phone){
   saveCust(c);
   return c[ph];
 }
+/* مانده هر مشتری — ضدخطا: رکوردهای ناقص نادیده گرفته می‌شوند */
 function custBalance(ph){
-  const txs = jget(TX, []).filter(t => t.phone === ph);
+  const txs = jget(TX, []).filter(t => t && t.phone === ph);
   let gold = 0, debt = 0;
   txs.forEach(t => {
-    if(t.type === "goldIn") gold += t.weight;
-    if(t.type === "goldOut") gold -= t.weight;
-    if(t.type === "debtAdd") debt += t.weight;
-    if(t.type === "debtPay") debt -= t.weight;
+    const w = safe(t.weight);
+    if(t.type === "goldIn") gold += w;
+    if(t.type === "goldOut") gold -= w;
+    if(t.type === "debtAdd") debt += w;
+    if(t.type === "debtPay") debt -= w;
   });
-  return {gold: gold, debt: debt};
+  return {gold: safe(gold), debt: safe(debt)};
 }
 function renderCustDatalists(){
   const c = customers(), keys = Object.keys(c);
@@ -651,7 +656,7 @@ function renderCustList(){
     el.className = "custItem";
     el.innerHTML =
       '<div class="custTop"><span>👤 ' + cu.name + '</span><span>' + cu.points + ' امتیاز</span></div>' +
-      '<div class="custMeta">📱 ' + fa2en(cu.phone) + ' — ' + cu.purchases.length + ' خرید — جمع خرید: ' + fmt(cu.purchases.reduce((a,x) => a + x.total, 0)) + ' تومان</div>' +
+      '<div class="custMeta">📱 ' + fa2en(cu.phone) + ' — ' + cu.purchases.length + ' خرید — جمع خرید: ' + fmt(cu.purchases.reduce((a,x) => a + safe(x.total), 0)) + ' تومان</div>' +
       (bal.gold > 0.001 ? '<div class="custMeta" style="color:#8a6d1a">⚖️ طلای نزد شما: ' + fmtFa(bal.gold) + ' گرم</div>' : '') +
       (bal.debt > 0.001 ? '<div class="custMeta" style="color:#9d2c2c">📕 بدهکار: ' + fmtFa(bal.debt) + ' گرم طلا</div>' : '') +
       (bal.debt < -0.001 ? '<div class="custMeta" style="color:#2e7d4f">📗 بستانکار: ' + fmtFa(-bal.debt) + ' گرم طلا</div>' : '') +
@@ -733,12 +738,13 @@ $("txSave").onclick = () => {
 };
 const TX_LABEL = {goldIn: "📥 سپرده طلا", goldOut: "📤 برداشت طلا", debtAdd: "📕 بدهی طلا", debtPay: "📗 تسویه طلا", buyGold: "🛒 خرید طلا"};
 function renderTxList(){
-  const arr = jget(TX, []).slice().reverse().slice(0, 30);
+  const arr = jget(TX, []).slice().reverse().slice(0, 50);
   const div = $("txList");
   if(!arr.length){ div.innerHTML = '<p class="note">هنوز تراکنشی ثبت نشده است.</p>'; return; }
   const c = customers();
   div.innerHTML = "";
   arr.forEach(t => {
+    if(!t || !t.id) return;
     const el = document.createElement("div");
     el.className = "txItem";
     const val = t.type === "buyGold"
@@ -746,7 +752,15 @@ function renderTxList(){
       : fmtFa(t.weight) + ' گرم';
     el.innerHTML =
       '<div class="txTop"><span>' + TX_LABEL[t.type] + ' — ' + ((c[t.phone] || {}).name || t.phone) + '</span><span>' + val + '</span></div>' +
-      '<div class="txMeta">' + jdate(t.ts) + (t.note ? ' — ' + t.note : '') + '</div>';
+      '<div class="txMeta">' + jdate(t.ts) + (t.note ? ' — ' + t.note : '') + '</div>' +
+      '<div class="arcBtns"><button class="txDel">🗑️ حذف این تراکنش</button></div>';
+    el.querySelector(".txDel").onclick = () => {
+      if(confirm("این تراکنش حذف شود؟ مانده‌های مرتبط خودکار اصلاح می‌شوند.")){
+        jset(TX, jget(TX, []).filter(x => !(x && x.id === t.id)));
+        renderTxList(); renderCustList(); renderFinance();
+        toast("تراکنش حذف و مانده‌ها اصلاح شد ✓");
+      }
+    };
     div.appendChild(el);
   });
 }
@@ -919,17 +933,16 @@ function renderFinance(){
   if($("finGold0").value === "" && fin.gold0) $("finGold0").value = fin.gold0;
   if($("finCash0").value === "" && fin.cash0) $("finCash0").value = fin.cash0;
   const invs = jget(ARC, []).filter(o => inRange(o.ts));
-  const sold = jget(ARC, []).reduce((a,o) => a + (o.wSum || 0), 0);
+  const sold = jget(ARC, []).reduce((a,o) => a + safe(o.wSum), 0);
   const exps = jget(EXP, []).filter(e => inRange(e.ts));
-  const revenue = invs.reduce((a,o) => a + o.sumPa, 0);
-  const expense = exps.reduce((a,e) => a + e.amount, 0);
-  const sales = invs.reduce((a,o) => a + o.total, 0);
-  /* خرید طلا از مشتریان */
-  const txs = jget(TX, []);
+  const revenue = invs.reduce((a,o) => a + safe(o.sumPa), 0);
+  const expense = exps.reduce((a,e) => a + safe(e.amount), 0);
+  const sales = invs.reduce((a,o) => a + safe(o.total), 0);
+  const txs = jget(TX, []).filter(t => t);
   const buys = txs.filter(t => t.type === "buyGold" && inRange(t.ts));
-  const buyAmount = buys.reduce((a,t) => a + (t.amount || 0), 0);
-  const buyWeight = buys.reduce((a,t) => a + (t.weight || 0), 0);
-  const boughtAll = txs.filter(t => t.type === "buyGold").reduce((a,t) => a + (t.weight || 0), 0);
+  const buyAmount = buys.reduce((a,t) => a + safe(t.amount), 0);
+  const buyWeight = buys.reduce((a,t) => a + safe(t.weight), 0);
+  const boughtAll = txs.filter(t => t.type === "buyGold").reduce((a,t) => a + safe(t.weight), 0);
   let totalDebt = 0, totalCredit = 0, escrowGold = 0;
   Object.keys(customers()).forEach(k => {
     const b = custBalance(k);
@@ -937,8 +950,8 @@ function renderFinance(){
     if(b.debt < 0) totalCredit += -b.debt;
     escrowGold += b.gold;
   });
-  const cash = (fin.cash0 || 0) + jget(ARC, []).reduce((a,o) => a + o.total, 0) - jget(EXP, []).reduce((a,e) => a + e.amount, 0) - txs.filter(t => t.type === "buyGold").reduce((a,t) => a + (t.amount || 0), 0);
-  const gold = (fin.gold0 || 0) - sold + boughtAll;
+  const cash = safe(fin.cash0) + jget(ARC, []).reduce((a,o) => a + safe(o.total), 0) - jget(EXP, []).reduce((a,e) => a + safe(e.amount), 0) - txs.filter(t => t.type === "buyGold").reduce((a,t) => a + safe(t.amount), 0);
+  const gold = safe(fin.gold0) - sold + boughtAll;
   $("finDash").innerHTML =
     '<div class="dashBox"><div class="v">' + fmtFa(gold) + '</div><div class="l">موجودی طلا (گرم)</div></div>' +
     '<div class="dashBox"><div class="v">' + fmt(cash) + '</div><div class="l">مانده صندوق (تومان)</div></div>' +
