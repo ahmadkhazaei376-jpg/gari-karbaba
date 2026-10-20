@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="کهربا">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<title>کهربا | گالری طلا — نسخه ۶</title>
+<title>کهربا | گالری طلا — نسخه ۷</title>
 <style>
 :root{--bg:#f7f3ea;--card:#fffdf8;--ink:#2f261a;--gold:#c9a227;--gold2:#f2df9b;--muted:#7d7468;--danger:#9d2c2c;--ok:#2e7d4f;--line:#e8dfcf}
 *{box-sizing:border-box}
@@ -21,7 +21,7 @@ body{margin:0;background:radial-gradient(circle at top,#fffaf0,#f2ede3 70%);font
 .brandSub{font-size:9px;letter-spacing:4px;white-space:nowrap;color:#d9c07a;margin:2px 0 4px;position:relative;z-index:1}
 .badge{display:inline-block;margin-top:8px;background:#c9a22722;border:1px solid #c9a22777;color:#f2df9b;border-radius:99px;padding:4px 12px;font-size:11px;position:relative;z-index:1}
 #installBtn{display:none;margin-top:10px;border:1px solid #f2df9b;background:transparent;color:#f2df9b;border-radius:99px;padding:6px 16px;font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;position:relative;z-index:1}
-nav.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:12px;position:relative;z-index:1}
+nav.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:12px;position:relative;z-index:1}
 nav.tabs button{border:1px solid #c9a22755;background:#ffffff10;color:#eadfbf;border-radius:12px;padding:8px 2px;font-family:inherit;font-size:10.5px;font-weight:800;cursor:pointer}
 nav.tabs button.on{background:var(--gold);color:#20190f;border-color:var(--gold)}
 .panel{display:none}.panel.on{display:block}
@@ -90,6 +90,12 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
 .chips button{border:1px solid #d9cfbd;background:#fff;border-radius:99px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
 .chips button.on{background:var(--gold);color:#20190f;border-color:var(--gold)}
 .txDel{border:0;background:#f6e3e3;color:var(--danger);border-radius:10px;padding:6px 10px;font-family:inherit;font-weight:800;font-size:11px;cursor:pointer}
+.repSec{margin-top:12px;border:1px solid #e8dfcf;border-radius:14px;overflow:hidden}
+.repSec h4{margin:0;background:#f4ecd8;padding:9px 12px;font-size:12.5px}
+.repSec .resultline{border-bottom:1px dashed #e8dfcf;padding:7px 12px;margin:0;background:#fff}
+.repSec .resultline:last-child{border-bottom:0}
+.repHead{text-align:center;font-size:11px;color:var(--muted);line-height:1.9;margin-bottom:4px}
+.empty{padding:14px;text-align:center;color:var(--muted);font-size:12px}
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:11px 20px;border-radius:14px;font-size:12px;opacity:0;transition:.3s;z-index:9;max-width:90%;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 #printArea{display:none}
@@ -104,9 +110,10 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
   #printArea td{padding:7px 4px;border-bottom:1px dashed #bbb}
   #printArea td:last-child,#printArea th:last-child{text-align:left;font-weight:700}
   #printArea tr.total td{border-top:2px solid #c9a227;border-bottom:0;font-size:15px;font-weight:900}
+  #printArea .sec{margin-top:14px;background:#f4ecd8;padding:6px 10px;font-weight:800;font-size:12px;border-radius:8px}
   #printArea .pf{margin-top:16px;text-align:center;font-size:10px;color:#888}
 }
-@media(max-width:380px){.row{grid-template-columns:1fr}.actions{grid-template-columns:1fr}.itemGrid{grid-template-columns:1fr 1fr}.iName{grid-column:1/3}.iTag{grid-column:1/2}nav.tabs{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:380px){.row{grid-template-columns:1fr}.actions{grid-template-columns:1fr}.itemGrid{grid-template-columns:1fr 1fr}.iName{grid-column:1/3}.iTag{grid-column:1/2}}
 </style>
 </head>
 <body>
@@ -140,7 +147,7 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
       </svg>
     </div>
     <div class="brandSub">G A L L E R Y &nbsp; K A H R O B A</div>
-    <div class="badge">نسخه ۶ — حسابداری و باشگاه مشتریان</div>
+    <div class="badge">نسخه ۷ — گزارش‌گیری و حسابداری</div>
     <div><button id="installBtn">📲 نصب برنامه</button></div>
     <nav class="tabs" id="tabs">
       <button data-t="sale" class="on">🛍 فروش</button>
@@ -148,6 +155,7 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
       <button data-t="customers">💎 مشتریان</button>
       <button data-t="ledger">⚖️ طلا و بدهی</button>
       <button data-t="finance">📒 حسابداری</button>
+      <button data-t="report">📄 گزارش</button>
     </nav>
   </header>
 
@@ -376,7 +384,45 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
     </div>
   </section>
 
-  <div class="footer">کهربا • نسخه وب v6</div>
+  <!-- ================= گزارش ================= -->
+  <section class="panel" id="p-report">
+    <div class="card">
+      <label style="font-size:14px">📊 گزارش کلی مغازه</label>
+      <div class="chips" id="repChips" style="margin-top:10px">
+        <button data-r="today">امروز</button>
+        <button data-r="cmonth" class="on">ماه جاری</button>
+        <button data-r="l30">۳۰ روز اخیر</button>
+        <button data-r="all">کل دوره</button>
+      </div>
+      <div class="repHead" id="repHead"></div>
+      <div id="repOverall"><p class="empty">بازه را انتخاب کن تا گزارش ساخته شود.</p></div>
+      <div class="actions">
+        <button class="btn goldbtn" id="repOPrint">🖨️ چاپ</button>
+        <button class="btn okbtn" id="repOCopy">📋 کپی</button>
+      </div>
+      <div class="actions">
+        <button class="btn darkbtn" id="repOShare">⚡ ارسال گزارش</button>
+      </div>
+    </div>
+    <div class="card">
+      <label style="font-size:14px">👤 گزارش پرونده مشتری</label>
+      <div class="row" style="margin-top:10px">
+        <label for="repCust">انتخاب مشتری</label>
+        <select id="repCust" class="input"><option value="">— انتخاب کن —</option></select>
+      </div>
+      <div id="repCustOut"><p class="empty">مشتری را انتخاب کن تا پرونده کاملش (خریدها، امتیاز و دفتر طلا) نمایش داده شود.</p></div>
+      <div class="actions">
+        <button class="btn goldbtn" id="repCPrint">🖨️ چاپ</button>
+        <button class="btn okbtn" id="repCCopy">📋 کپی</button>
+      </div>
+      <div class="actions">
+        <button class="btn darkbtn" id="repCSms">📱 پیامک</button>
+        <button class="btn darkbtn" id="repCWa">🟢 واتساپ</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer">کهربا • نسخه وب v7</div>
 </div>
 <div id="printArea"></div>
 <div id="toast"></div>
@@ -403,6 +449,7 @@ const fmt = n => new Intl.NumberFormat("fa-IR", {maximumFractionDigits: 0}).form
 const fmtFa = n => new Intl.NumberFormat("fa-IR", {maximumFractionDigits: 2}).format(safe(n));
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2600);}
 function jdate(ts){try{return new Intl.DateTimeFormat("fa-IR",{dateStyle:"short",timeStyle:"short"}).format(new Date(ts));}catch(e){return new Date(ts).toLocaleString();}}
+function jday(ts){try{return new Intl.DateTimeFormat("fa-IR",{dateStyle:"medium"}).format(new Date(ts));}catch(e){return new Date(ts).toLocaleDateString();}}
 function dbg(t){$("rawResp").textContent = t;}
 async function copyText(txt, msg){
   try{ await navigator.clipboard.writeText(txt); toast(msg); }
@@ -421,6 +468,7 @@ document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => {
   document.querySelectorAll(".panel").forEach(p => p.classList.remove("on"));
   $("p-" + b.dataset.t).classList.add("on");
   window.scrollTo({top: 0, behavior: "smooth"});
+  if(b.dataset.t === "report"){ buildOverall(); }
 });
 
 /* ---------- ردیف کالاها ---------- */
@@ -642,6 +690,11 @@ function renderCustDatalists(){
   const html = keys.map(k => '<option value="' + k + '">' + c[k].name + '</option>').join("");
   $("custList").innerHTML = html;
   $("custList2").innerHTML = html;
+  const sel = $("repCust");
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— انتخاب کن —</option>' +
+    keys.map(k => '<option value="' + k + '">' + c[k].name + ' (' + fa2en(k) + ')</option>').join("");
+  if(cur && c[cur]) sel.value = cur;
 }
 function renderCustList(){
   const q = normPh($("custSearch").value) || $("custSearch").value.trim();
@@ -1024,10 +1077,293 @@ $("expWipe").onclick = () => {
   if(confirm("همه هزینه‌ها پاک شود؟")){ jset(EXP, []); renderExpList(); renderFinance(); toast("هزینه‌ها پاک شد"); }
 };
 
+/* ---------- گزارش‌ها ---------- */
+let repRange = "cmonth";
+const REP_NAMES = {today: "امروز", cmonth: "ماه جاری", l30: "۳۰ روز اخیر", all: "کل دوره"};
+function repRangeTs(){
+  const now = new Date();
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  if(repRange === "today") return [startToday, Date.now()];
+  if(repRange === "cmonth") return [new Date(now.getFullYear(), now.getMonth(), 1).getTime(), Date.now()];
+  if(repRange === "l30") return [startToday - 29 * 86400000, Date.now()];
+  return [0, Date.now()];
+}
+function overallData(){
+  const [f, t] = repRangeTs();
+  const invs = jget(ARC, []).filter(o => o.ts >= f && o.ts <= t);
+  const exps = jget(EXP, []).filter(e => e.ts >= f && e.ts <= t);
+  const allTx = jget(TX, []).filter(x => x);
+  const buys = allTx.filter(x => x.type === "buyGold" && x.ts >= f && x.ts <= t);
+  const sales = invs.reduce((a,o) => a + safe(o.total), 0);
+  const rawSum = invs.reduce((a,o) => a + safe(o.sumRaw), 0);
+  const making = invs.reduce((a,o) => a + safe(o.sumMa), 0);
+  const profit = invs.reduce((a,o) => a + safe(o.sumPa), 0);
+  const tax = invs.reduce((a,o) => a + safe(o.tax), 0);
+  const soldW = invs.reduce((a,o) => a + safe(o.wSum), 0);
+  const expense = exps.reduce((a,e) => a + safe(e.amount), 0);
+  const buyAmt = buys.reduce((a,x) => a + safe(x.amount), 0);
+  const buyW = buys.reduce((a,x) => a + safe(x.weight), 0);
+  const expByCat = {};
+  exps.forEach(e => { expByCat[e.cat] = (expByCat[e.cat] || 0) + safe(e.amount); });
+  let escrow = 0, debt = 0, credit = 0;
+  Object.keys(customers()).forEach(k => {
+    const b = custBalance(k);
+    escrow += b.gold;
+    if(b.debt > 0) debt += b.debt; else credit += -b.debt;
+  });
+  const fin = jget(FIN, {gold0: 0, cash0: 0});
+  const goldInv = safe(fin.gold0) - jget(ARC, []).reduce((a,o) => a + safe(o.wSum), 0) + allTx.filter(x => x.type === "buyGold").reduce((a,x) => a + safe(x.weight), 0);
+  const cash = safe(fin.cash0) + jget(ARC, []).reduce((a,o) => a + safe(o.total), 0) - jget(EXP, []).reduce((a,e) => a + safe(e.amount), 0) - allTx.filter(x => x.type === "buyGold").reduce((a,x) => a + safe(x.amount), 0);
+  return {f: f, t: t, invs: invs, exps: exps, sales: sales, rawSum: rawSum, making: making, profit: profit, tax: tax,
+          soldW: soldW, expense: expense, buyAmt: buyAmt, buyW: buyW, expByCat: expByCat,
+          escrow: escrow, debt: debt, credit: credit, goldInv: goldInv, cash: cash};
+}
+function sec(title, lines){
+  if(!lines.length) return "";
+  return '<div class="repSec"><h4>' + title + '</h4>' +
+    lines.map(l => '<div class="resultline"><span>' + l[0] + '</span><strong>' + l[1] + '</strong></div>').join("") + '</div>';
+}
+function buildOverall(){
+  const d = overallData();
+  $("repHead").innerHTML = 'بازه: <b>' + REP_NAMES[repRange] + '</b><br>' +
+    (repRange === "all" ? "از ابتدا تا امروز" : "از " + jday(d.f) + " تا " + jday(d.t)) +
+    '<br>تاریخ گزارش: ' + jdate(d.t) + " — گالری کهربا";
+  let html = "";
+  html += sec("🛍 فروش", [
+    ["تعداد فاکتور", fmt(d.invs.length)],
+    ["جمع فروش", fmt(d.sales) + " تومان"],
+    ["اصل قیمت طلا", fmt(d.rawSum) + " تومان"],
+    ["جمع اجرت", fmt(d.making) + " تومان"],
+    ["جمع سود (درآمد)", fmt(d.profit) + " تومان"],
+    ["مالیات ارزش افزوده", fmt(d.tax) + " تومان"],
+    ["وزن فروخته‌شده", fmtFa(d.soldW) + " گرم"]
+  ]);
+  html += sec("🛒 خرید طلا از مشتریان", [
+    ["تعداد تراکنش", fmt(d.invs.length >= 0 ? (jget(TX,[]).filter(x => x && x.type === "buyGold" && x.ts >= d.f && x.ts <= d.t).length) : 0)],
+    ["وزن خریداری‌شده", fmtFa(d.buyW) + " گرم"],
+    ["مبلغ پرداختی", fmt(d.buyAmt) + " تومان"]
+  ]);
+  const expLines = Object.keys(d.expByCat).map(cat => [cat, fmt(d.expByCat[cat]) + " تومان"]);
+  expLines.push(["جمع هزینه‌ها", fmt(d.expense) + " تومان"]);
+  html += sec("➖ هزینه‌ها", expLines);
+  html += sec("📈 نتیجه دوره", [
+    ["سود ناخالص (سود فروش)", fmt(d.profit) + " تومان"],
+    ["سود خالص (پس از هزینه‌ها)", fmt(d.profit - d.expense) + " تومان"]
+  ]);
+  html += sec("🏦 وضعیت فعلی مغازه", [
+    ["موجودی طلا", fmtFa(d.goldInv) + " گرم"],
+    ["مانده صندوق", fmt(d.cash) + " تومان"],
+    ["طلای امانی مشتریان", fmtFa(d.escrow) + " گرم"],
+    ["بدهی طلا مشتریان", fmtFa(d.debt) + " گرم"],
+    ["بستانکاری مشتریان", fmtFa(d.credit) + " گرم"]
+  ]);
+  if(!d.invs.length && !d.exps.length && !d.buyW)
+    html = '<p class="empty">در این بازه فروش، خرید یا هزینه‌ای ثبت نشده است.</p>' + html;
+  $("repOverall").innerHTML = html;
+}
+function overallText(){
+  const d = overallData();
+  let t = "📊 گزارش کلی — گالری کهربا\n" +
+    "بازه: " + REP_NAMES[repRange] + "\n" +
+    (repRange === "all" ? "" : "از " + jday(d.f) + " تا " + jday(d.t) + "\n") +
+    "──────────────\n🛍 فروش:\n" +
+    "تعداد فاکتور: " + fmt(d.invs.length) + "\n" +
+    "جمع فروش: " + fmt(d.sales) + " تومان\n" +
+    "اصل قیمت طلا: " + fmt(d.rawSum) + " تومان\n" +
+    "جمع اجرت: " + fmt(d.making) + " تومان\n" +
+    "جمع سود: " + fmt(d.profit) + " تومان\n" +
+    "مالیات: " + fmt(d.tax) + " تومان\n" +
+    "وزن فروخته‌شده: " + fmtFa(d.soldW) + " گرم\n" +
+    "──────────────\n🛒 خرید طلا از مشتریان:\n" +
+    "وزن: " + fmtFa(d.buyW) + " گرم — مبلغ: " + fmt(d.buyAmt) + " تومان\n" +
+    "──────────────\n➖ هزینه‌ها:\n";
+  Object.keys(d.expByCat).forEach(cat => { t += cat + ": " + fmt(d.expByCat[cat]) + " تومان\n"; });
+  t += "جمع هزینه‌ها: " + fmt(d.expense) + " تومان\n" +
+    "──────────────\n📈 سود ناخالص: " + fmt(d.profit) + " تومان\n" +
+    "سود خالص: " + fmt(d.profit - d.expense) + " تومان\n" +
+    "──────────────\n🏦 موجودی طلا: " + fmtFa(d.goldInv) + " گرم — صندوق: " + fmt(d.cash) + " تومان\n" +
+    "امانی مشتریان: " + fmtFa(d.escrow) + " گرم — بدهی مشتریان: " + fmtFa(d.debt) + " گرم";
+  return t;
+}
+function custReportData(ph){
+  const c = customers();
+  const cu = c[ph];
+  if(!cu) return null;
+  const txs = jget(TX, []).filter(x => x && x.phone === ph).sort((a,b) => a.ts - b.ts);
+  const invs = jget(ARC, []).filter(o => o.phone === ph).sort((a,b) => a.ts - b.ts);
+  let g = 0, d = 0;
+  const ledger = txs.map(x => {
+    const w = safe(x.weight);
+    if(x.type === "goldIn") g += w;
+    if(x.type === "goldOut") g -= w;
+    if(x.type === "debtAdd") d += w;
+    if(x.type === "debtPay") d -= w;
+    return {tx: x, gBal: g, dBal: d};
+  });
+  return {
+    cu: cu, ph: ph, invs: invs, ledger: ledger,
+    totalBuy: cu.purchases.reduce((a,x) => a + safe(x.total), 0),
+    bal: {gold: g, debt: d}
+  };
+}
+function buildCustReport(ph){
+  const r = custReportData(ph);
+  const out = $("repCustOut");
+  if(!r){ out.innerHTML = '<p class="empty">مشتری را انتخاب کن تا پرونده کاملش (خریدها، امتیاز و دفتر طلا) نمایش داده شود.</p>'; return; }
+  const cu = r.cu;
+  let html = '<div class="repHead">👤 <b>' + cu.name + '</b> — 📱 ' + fa2en(cu.ph) +
+    '<br>عضو از: ' + jday(cu.created) + ' — تاریخ گزارش: ' + jdate(Date.now()) + '</div>';
+  html += sec("💎 خلاصه پرونده", [
+    ["تعداد خرید", fmt(cu.purchases.length)],
+    ["جمع مبلغ خریدها", fmt(r.totalBuy) + " تومان"],
+    ["امتیاز وفاداری", fmt(cu.points)],
+    ["طلای نزد شما (امانی)", fmtFa(r.bal.gold) + " گرم"],
+    ["بدهی طلا", r.bal.debt > 0 ? fmtFa(r.bal.debt) + " گرم" : (r.bal.debt < 0 ? "بستانکار " + fmtFa(-r.bal.debt) + " گرم" : "تسویه ✓")]
+  ]);
+  const invLines = r.invs.slice().reverse().map(o =>
+    [jday(o.ts) + " — " + o.items.map(i => i.name).join("، "), fmt(o.total) + " تومان"]
+  );
+  html += sec("🧾 سابقه خریدها", invLines);
+  const ledLines = r.ledger.slice().reverse().map(x => {
+    const L = TX_LABEL[x.tx.type];
+    const val = x.tx.type === "buyGold"
+      ? fmtFa(x.tx.weight) + " گرم / " + fmt(x.tx.amount) + " تومان"
+      : fmtFa(x.tx.weight) + " گرم";
+    let extra = "";
+    if(x.tx.type === "goldIn" || x.tx.type === "goldOut") extra = " — امانی: " + fmtFa(x.gBal) + " گرم";
+    if(x.tx.type === "debtAdd" || x.tx.type === "debtPay") extra = " — بدهی: " + fmtFa(x.dBal) + " گرم";
+    return [jday(x.tx.ts) + " — " + L + (x.tx.note ? " (" + x.tx.note + ")" : ""), val + extra];
+  });
+  html += sec("⚖️ دفتر طلا و بدهی", ledLines);
+  out.innerHTML = html;
+}
+function custReportText(ph){
+  const r = custReportData(ph);
+  if(!r) return "";
+  const cu = r.cu;
+  let t = "👤 پرونده مشتری — گالری کهربا\n" +
+    "نام: " + cu.name + "\nموبایل: " + fa2en(cu.ph) + "\nعضو از: " + jday(cu.created) + "\n" +
+    "──────────────\n💎 خلاصه:\n" +
+    "تعداد خرید: " + fmt(cu.purchases.length) + "\n" +
+    "جمع خریدها: " + fmt(r.totalBuy) + " تومان\n" +
+    "امتیاز وفاداری: " + fmt(cu.points) + "\n" +
+    "طلای نزد گالری: " + fmtFa(r.bal.gold) + " گرم\n" +
+    "بدهی طلا: " + (r.bal.debt > 0 ? fmtFa(r.bal.debt) + " گرم" : (r.bal.debt < 0 ? "بستانکار " + fmtFa(-r.bal.debt) + " گرم" : "تسویه شده ✓")) + "\n" +
+    "──────────────\n🧾 خریدها:\n";
+  if(!r.invs.length) t += "—\n";
+  r.invs.slice().reverse().forEach(o => {
+    t += jday(o.ts) + " — " + o.items.map(i => i.name).join("، ") + " — " + fmt(o.total) + " تومان\n";
+  });
+  t += "──────────────\n⚖️ دفتر طلا و بدهی:\n";
+  if(!r.ledger.length) t += "—\n";
+  r.ledger.slice().reverse().forEach(x => {
+    const val = x.tx.type === "buyGold"
+      ? fmtFa(x.tx.weight) + " گرم / " + fmt(x.tx.amount) + " تومان"
+      : fmtFa(x.tx.weight) + " گرم";
+    t += jday(x.tx.ts) + " — " + TX_LABEL[x.tx.type] + ": " + val + (x.tx.note ? " (" + x.tx.note + ")" : "") + "\n";
+  });
+  return t;
+}
+function printCustReport(ph){
+  const r = custReportData(ph);
+  if(!r){ toast("اول مشتری را انتخاب کنید"); return; }
+  const cu = r.cu;
+  let body =
+    '<div class="sec">خلاصه پرونده</div><table>' +
+    '<tr><td>تعداد خرید</td><td>' + fmt(cu.purchases.length) + '</td></tr>' +
+    '<tr><td>جمع مبلغ خریدها</td><td>' + fmt(r.totalBuy) + ' تومان</td></tr>' +
+    '<tr><td>امتیاز وفاداری</td><td>' + fmt(cu.points) + '</td></tr>' +
+    '<tr><td>طلای نزد گالری</td><td>' + fmtFa(r.bal.gold) + ' گرم</td></tr>' +
+    '<tr class="total"><td>بدهی طلا</td><td>' + (r.bal.debt > 0 ? fmtFa(r.bal.debt) + ' گرم' : (r.bal.debt < 0 ? 'بستانکار ' + fmtFa(-r.bal.debt) + ' گرم' : 'تسویه شده')) + '</td></tr></table>';
+  if(r.invs.length){
+    body += '<div class="sec">سابقه خریدها</div><table><tr><th>تاریخ</th><th>اقلام</th><th>مبلغ</th></tr>' +
+      r.invs.slice().reverse().map(o => '<tr><td>' + jday(o.ts) + '</td><td>' + o.items.map(i => i.name).join("، ") + '</td><td>' + fmt(o.total) + '</td></tr>').join("") + '</table>';
+  }
+  if(r.ledger.length){
+    body += '<div class="sec">دفتر طلا و بدهی</div><table><tr><th>تاریخ</th><th>نوع</th><th>مقدار</th></tr>' +
+      r.ledger.slice().reverse().map(x => '<tr><td>' + jday(x.tx.ts) + '</td><td>' + TX_LABEL[x.tx.type] + '</td><td>' +
+        (x.tx.type === "buyGold" ? fmtFa(x.tx.weight) + ' گرم / ' + fmt(x.tx.amount) + ' تومان' : fmtFa(x.tx.weight) + ' گرم') + '</td></tr>').join("") + '</table>';
+  }
+  $("printArea").innerHTML =
+    '<div style="text-align:center">' + LOGO_SVG.replace('width="260" height="84"','width="200" height="65"') + '</div>' +
+    '<h2 style="margin:0 0 4px">پرونده مشتری</h2>' +
+    '<div class="ph">' + cu.name + ' — 📱 ' + fa2en(cu.ph) + ' — عضو از ' + jday(cu.created) + '</div>' +
+    body +
+    '<div class="pf">این گزارش توسط گالری کهربا صادر شده است.</div>';
+  window.print();
+}
+function printOverall(){
+  const d = overallData();
+  let body =
+    '<div class="sec">فروش</div><table>' +
+    '<tr><td>تعداد فاکتور</td><td>' + fmt(d.invs.length) + '</td></tr>' +
+    '<tr><td>جمع فروش</td><td>' + fmt(d.sales) + ' تومان</td></tr>' +
+    '<tr><td>اصل قیمت طلا</td><td>' + fmt(d.rawSum) + ' تومان</td></tr>' +
+    '<tr><td>جمع اجرت</td><td>' + fmt(d.making) + ' تومان</td></tr>' +
+    '<tr><td>جمع سود (درآمد)</td><td>' + fmt(d.profit) + ' تومان</td></tr>' +
+    '<tr><td>مالیات ارزش افزوده</td><td>' + fmt(d.tax) + ' تومان</td></tr>' +
+    '<tr><td>وزن فروخته‌شده</td><td>' + fmtFa(d.soldW) + ' گرم</td></tr></table>' +
+    '<div class="sec">خرید طلا از مشتریان</div><table>' +
+    '<tr><td>وزن خریداری‌شده</td><td>' + fmtFa(d.buyW) + ' گرم</td></tr>' +
+    '<tr><td>مبلغ پرداختی</td><td>' + fmt(d.buyAmt) + ' تومان</td></tr></table>' +
+    '<div class="sec">هزینه‌ها</div><table>' +
+    Object.keys(d.expByCat).map(cat => '<tr><td>' + cat + '</td><td>' + fmt(d.expByCat[cat]) + ' تومان</td></tr>').join("") +
+    '<tr class="total"><td>جمع هزینه‌ها</td><td>' + fmt(d.expense) + ' تومان</td></tr></table>' +
+    '<div class="sec">نتیجه دوره</div><table>' +
+    '<tr><td>سود ناخالص</td><td>' + fmt(d.profit) + ' تومان</td></tr>' +
+    '<tr class="total"><td>سود خالص (پس از هزینه‌ها)</td><td>' + fmt(d.profit - d.expense) + ' تومان</td></tr></table>' +
+    '<div class="sec">وضعیت فعلی مغازه</div><table>' +
+    '<tr><td>موجودی طلا</td><td>' + fmtFa(d.goldInv) + ' گرم</td></tr>' +
+    '<tr><td>مانده صندوق</td><td>' + fmt(d.cash) + ' تومان</td></tr>' +
+    '<tr><td>طلای امانی مشتریان</td><td>' + fmtFa(d.escrow) + ' گرم</td></tr>' +
+    '<tr><td>بدهی طلا مشتریان</td><td>' + fmtFa(d.debt) + ' گرم</td></tr>' +
+    '<tr><td>بستانکاری مشتریان</td><td>' + fmtFa(d.credit) + ' گرم</td></tr></table>';
+  $("printArea").innerHTML =
+    '<div style="text-align:center">' + LOGO_SVG.replace('width="260" height="84"','width="200" height="65"') + '</div>' +
+    '<h2 style="margin:0 0 4px">گزارش کلی مغازه</h2>' +
+    '<div class="ph">بازه: ' + REP_NAMES[repRange] + (repRange === "all" ? "" : " — از " + jday(d.f) + " تا " + jday(d.t)) + '</div>' +
+    body +
+    '<div class="pf">این گزارش توسط گالری کهربا صادر شده است.</div>';
+  window.print();
+}
+document.querySelectorAll("#repChips button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("#repChips button").forEach(x => x.classList.remove("on"));
+  b.classList.add("on");
+  repRange = b.dataset.r;
+  buildOverall();
+});
+$("repCust").addEventListener("change", () => buildCustReport($("repCust").value));
+$("repOPrint").onclick = printOverall;
+$("repOCopy").onclick = () => copyText(overallText(), "گزارش کپی شد ✓");
+$("repOShare").onclick = async () => {
+  if(navigator.share){ try{ await navigator.share({title: "گزارش گالری کهربا", text: overallText()}); }catch(e){} }
+  else copyText(overallText(), "ارسال پشتیبانی نشد — متن کپی شد ✓");
+};
+$("repCPrint").onclick = () => {
+  const ph = $("repCust").value;
+  if(!ph){ toast("اول مشتری را انتخاب کنید"); return; }
+  printCustReport(ph);
+};
+$("repCCopy").onclick = () => {
+  const ph = $("repCust").value;
+  if(!ph){ toast("اول مشتری را انتخاب کنید"); return; }
+  copyText(custReportText(ph), "پرونده مشتری کپی شد ✓");
+};
+$("repCSms").onclick = () => {
+  const ph = $("repCust").value;
+  if(!ph){ toast("اول مشتری را انتخاب کنید"); return; }
+  window.location.href = "sms:" + ph + "?body=" + encodeURIComponent(custReportText(ph));
+};
+$("repCWa").onclick = () => {
+  const ph = $("repCust").value;
+  if(!ph){ toast("اول مشتری را انتخاب کنید"); return; }
+  window.open("https://wa.me/98" + ph.replace(/^0/, "") + "?text=" + encodeURIComponent(custReportText(ph)), "_blank", "noopener");
+};
+
 /* ---------- پشتیبان‌گیری و بازیابی ---------- */
 const BK_KEYS = [STORE, STORE + "_meta", STORE + "_apikey", STORE + "_auto", STORE + "_dbg", ARC, CUST, TX, EXP, FIN];
 $("bkExport").onclick = () => {
-  const data = {app: "kahroba", ver: 6, ts: Date.now(), data: {}};
+  const data = {app: "kahroba", ver: 7, ts: Date.now(), data: {}};
   BK_KEYS.forEach(k => {
     const v = localStorage.getItem(k);
     if(v !== null) data.data[k] = v;
@@ -1130,6 +1466,7 @@ renderCustList();
 renderTxList();
 renderExpList();
 renderFinance();
+buildOverall();
 </script>
 </body>
 </html>
