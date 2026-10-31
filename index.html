@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="کهربا">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <title>کهربا | گالری طلا — نسخه ۸</title>
+  <title>کهربا | گالری طلا — نسخه ۹</title>
   <style>
 :root{--bg:#f7f3ea;--card:#fffdf8;--ink:#2f261a;--gold:#c9a227;--gold2:#f2df9b;--muted:#7d7468;--danger:#9d2c2c;--ok:#2e7d4f;--line:#e8dfcf}
 *{box-sizing:border-box}
@@ -143,13 +143,14 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
      </svg>
     </div>
     <div class="brandSub">G A L L E R Y &nbsp; K A H R O B A</div>
-    <div class="badge">نسخه ۸ — فاکتور تصویری و گزارش‌گیری</div>
+    <div class="badge">نسخه ۹ — انبار، دریافتی طلا و تخفیف</div>
     <div>
      <button id="installBtn">📲 نصب برنامه</button>
     </div>
     <nav class="tabs" id="tabs">
      <button data-t="sale" class="on">🛍 فروش</button>
      <button data-t="invoices">🗂 آرشیو</button>
+     <button data-t="stock">📦 انبار</button>
      <button data-t="customers">💎 مشتریان</button>
      <button data-t="ledger">⚖️ طلا و بدهی</button>
      <button data-t="finance">📒 حسابداری</button>
@@ -207,6 +208,17 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
       <input type="checkbox" id="taxOn"> <label for="taxOn">مالیات بر ارزش افزوده</label> <input id="taxRate" type="number" class="num" min="0" max="25" step="0.5" value="10">٪
      </div>
      <div class="unit" style="margin-top:-4px">مالیات فقط روی اجرت اعمال می‌شود</div>
+     <div style="margin-top:12px;border-top:1px dashed #e4d8ae;padding-top:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+       <label style="font-size:13px">📥 طلای دریافتی از مشتری (کارکرده / شکسته / آبشده)</label>
+       <button class="btn okbtn" id="addRecv" style="padding:7px 12px;font-size:11px">➕ افزودن</button>
+      </div>
+      <div id="recvList"></div>
+      <div class="unit">وزن × نرخ تعویض هر گرم از مبلغ فاکتور کسر و وزن به موجودی و گرم خریداری‌شده اضافه می‌شود.</div>
+     </div>
+     <div class="row" style="margin-top:10px">
+      <label for="invDisc">تخفیف نقدی (تومان)</label> <input id="invDisc" class="input num" inputmode="decimal" type="number" min="0" step="10000" placeholder="مثلاً 500000">
+     </div>
      <div class="actions">
       <button class="btn clearbtn" id="clear">پاک کردن همه</button>
       <button class="btn darkbtn" id="save">ذخیره اطلاعات</button>
@@ -234,6 +246,15 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
      <div class="resultline">
       <span>قیمت نهایی</span><strong id="final" class="final num">۰ تومان</strong>
      </div>
+     <div class="resultline" id="recvLine" style="display:none">
+      <span>📥 کسر طلای دریافتی</span><strong id="recvAmount" class="num" style="color:#2e7d4f">۰ تومان</strong>
+     </div>
+     <div class="resultline" id="discLine" style="display:none">
+      <span>🏷️ تخفیف نقدی</span><strong id="discAmount" class="num" style="color:#9d2c2c">۰ تومان</strong>
+     </div>
+     <div class="resultline" id="payableLine">
+      <span>💰 قابل پرداخت</span><strong id="payable" class="final num" style="color:#8a6d1a">۰ تومان</strong>
+     </div>
      <div class="actions" style="margin-top:12px">
       <button class="btn okbtn" id="copy">کپی نتیجه</button>
       <button class="btn darkbtn" id="invToggle">🧾 صدور فاکتور</button>
@@ -245,7 +266,7 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
       <label for="cName">نام مشتری</label><input id="cName" class="input" type="text" placeholder="نام و نام خانوادگی">
      </div>
      <div class="row">
-      <label for="cPhone">موبایل مشتری</label> <input id="cPhone" class="input num" type="tel" inputmode="tel" placeholder="09xxxxxxxxx" list="custList"> <datalist id="custList"></datalist>
+      <label for="cPhone">موبایل مشتری</label> <input id="cPhone" class="input num" type="tel" inputmode="tel" placeholder="09xxxxxxxxx" list="custList"> <datalist id="custList"></datalist><datalist id="stockCodes"></datalist><datalist id="stockCodes"></datalist>
      </div>
      <div class="unit" id="custHint" style="margin-top:-8px">اگر مشتری در باشگاه باشد، نام و امتیازش خودکار نمایش داده می‌شود.</div>
      <div class="invHead" id="invDate"></div>
@@ -283,12 +304,66 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
       <label style="font-size:14px">🗂️ آرشیو فاکتورها</label>
       <button class="btn clearbtn" id="arcWipe" style="padding:7px 12px;font-size:11px">پاک‌کردن کل آرشیو</button>
      </div>
+     <div class="row" style="margin-bottom:8px">
+      <input id="arcSearch" class="input" type="text" placeholder="🔍 جستجو با نام مشتری، شرح کالا، مبلغ یا تاریخ…">
+     </div>
      <div id="archiveList">
       <p class="note">هنوز فاکتوری ثبت نشده است.</p>
      </div>
     </div>
    </section>
    <!-- ================= مشتریان ================= -->
+   <section class="panel" id="p-stock">
+    <div class="card">
+     <label style="font-size:14px">📦 ثبت جنس در انبار</label>
+     <div class="row" style="margin-top:10px">
+      <label for="stCode">کد جنس</label> <input id="stCode" class="input num" type="text" placeholder="خالی بگذاری خودکار می‌خورد (مثل K-001)" list="stockCodes2"><datalist id="stockCodes2"></datalist>
+     </div>
+     <div class="row">
+      <label for="stName">شرح کالا</label> <input id="stName" class="input" type="text" placeholder="مثلاً انگشتر نگین‌دار ۱۸ عیار">
+     </div>
+     <div class="row">
+      <label for="stKind">نوع</label>
+      <select id="stKind" class="input">
+       <option value="نو" selected>✨ نو</option>
+       <option value="کارکرده">🔧 کارکرده</option>
+       <option value="شکسته">💔 شکسته</option>
+       <option value="آبشده">🔥 آبشده</option>
+      </select>
+     </div>
+     <div class="row">
+      <label for="stWeight">وزن (گرم)</label> <input id="stWeight" class="input num" inputmode="decimal" type="number" min="0" step="0.01" placeholder="مثلاً 8.30">
+     </div>
+     <div class="row">
+      <label for="stMaking">اجرت (٪)</label> <input id="stMaking" class="input num" inputmode="decimal" type="number" min="0" max="100" step="0.01" placeholder="مثلاً 7">
+     </div>
+     <div class="actions">
+      <button class="btn goldbtn" id="stSave">💾 ثبت در انبار</button>
+     </div>
+     <p class="note" style="margin-top:6px">تاریخ ورود خودکار ثبت می‌شود. کد را یادداشت کن تا موقع فروش با زدن کد، مشخصات جنس خودکار بیاید.</p>
+    </div>
+    <div class="card">
+     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px">
+      <label style="font-size:14px">📋 موجودی انبار</label>
+      <div class="chips" id="stChips" style="margin:0">
+       <button data-k="همه" class="on">همه</button>
+       <button data-k="نو">✨ نو</button>
+       <button data-k="کارکرده">🔧 کارکرده</button>
+       <button data-k="شکسته">💔 شکسته</button>
+       <button data-k="آبشده">🔥 آبشده</button>
+       <button data-k="فروخته‌شده">✅ فروخته‌شده</button>
+      </div>
+     </div>
+     <div class="row" style="margin-bottom:8px">
+      <input id="stSearch" class="input" type="text" placeholder="🔍 جستجو با کد، شرح یا وزن…">
+     </div>
+     <div id="stSummary"></div>
+     <div id="stockList"><p class="note">هنوز جنسی ثبت نشده است.</p></div>
+     <div class="actions">
+      <button class="btn goldbtn" id="stPrint">🖨️ چاپ لیست انبار</button>
+     </div>
+    </div>
+   </section>
    <section class="panel" id="p-customers">
     <div class="card">
      <label style="font-size:14px">💎 افزودن / ویرایش مشتری</label>
@@ -423,6 +498,13 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
      </div>
     </div>
     <div class="card">
+     <label style="font-size:14px">📊 نمودار سود ماهانه (۶ ماه اخیر)</label>
+     <div id="profitChart" style="margin-top:12px"></div>
+     <div class="actions">
+      <button class="btn okbtn" id="profitCopy">📋 کپی جدول اعداد</button>
+     </div>
+    </div>
+    <div class="card">
      <label style="font-size:14px">👤 گزارش پرونده مشتری</label>
      <div class="row" style="margin-top:10px">
       <label for="repCust">انتخاب مشتری</label> <select id="repCust" class="input"><option value="">— انتخاب کن —</option></select>
@@ -440,13 +522,13 @@ summary{cursor:pointer;font-size:12px;font-weight:800;color:var(--ink)}
      </div>
     </div>
    </section>
-   <div class="footer">کهربا • نسخه وب v8</div>
+   <div class="footer">کهربا • نسخه وب v9</div>
   </div>
   <div id="printArea"></div>
   <div id="toast"></div>
   <script>
 const $ = id => document.getElementById(id);
-const STORE = "gariKarbaba_v3", ARC = "kahroba_v5_archive", MESGHAL = 4.608;
+const STORE = "gariKarbaba_v3", ARC = "kahroba_v5_archive", MESGHAL = 4.608, STOCK = "kahroba_v9_stock";
 const CUST = "kahroba_v6_customers", TX = "kahroba_v6_tx", EXP = "kahroba_v6_expenses", FIN = "kahroba_v6_finance";
 const PRIV = "https://webservice.tgnsrv.ir/Pr/Get/ahmadkhazaei3760238/a09188370238a";
 const PUB  = "https://tabangohar.com/GheymatKhan/prices_in_table_parsian.html";
@@ -484,18 +566,21 @@ document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => {
   b.classList.add("on");
   document.querySelectorAll(".panel").forEach(p => p.classList.remove("on"));
   $("p-" + b.dataset.t).classList.add("on");
+  if(b.dataset.t === "report") buildProfitChart();
+  if(b.dataset.t === "stock") renderStock();
   window.scrollTo({top: 0, behavior: "smooth"});
   if(b.dataset.t === "report"){ buildOverall(); }
 });
 
 /* ---------- ردیف کالاها ---------- */
 function addItemRow(data){
-  const d = data || {n:"", w:"", m:"", s:""};
+  const d = data || {n:"", w:"", m:"", s:"", c:""};
   const div = document.createElement("div");
   div.className = "itemRow";
   div.innerHTML =
     '<div class="itemGrid">' +
     '<input class="input iName" type="text" placeholder="شرح کالا (مثلاً انگشتر ۱۸ عیار)" value="' + (d.n||"").replace(/"/g,"&quot;") + '">' +
+    '<input class="input num iCode" type="text" placeholder="کد انبار (اختیاری)" list="stockCodes" value="' + (d.c||"").replace(/"/g,"&quot;") + '" style="grid-column:1/3;font-size:13px">' +
     '<input class="input num iWeight" inputmode="decimal" type="number" min="0" step="0.01" placeholder="وزن" value="' + (d.w||"") + '">' +
     '<input class="input num iMaking" inputmode="decimal" type="number" min="0" max="100" step="0.01" placeholder="اجرت ٪" value="' + (d.m||"") + '">' +
     '<input class="input num iProfit" inputmode="decimal" type="number" min="0" max="7" step="0.01" placeholder="سود ٪" value="' + (d.s||"") + '">' +
@@ -504,6 +589,19 @@ function addItemRow(data){
     '</div>';
   div.querySelector(".iDel").onclick = () => { div.remove(); if(!$("items").children.length) addItemRow(); calculate(); };
   ["iName","iWeight","iMaking","iProfit"].forEach(c => div.querySelector("." + c).addEventListener("input", calculate));
+  div.querySelector(".iCode").addEventListener("input", () => {
+    const code = div.querySelector(".iCode").value.trim();
+    const it = jget(STOCK, []).find(x => x.code === code && x.status !== "فروخته‌شده");
+    if(it){
+      div.querySelector(".iName").value = it.name;
+      div.querySelector(".iWeight").value = it.weight;
+      div.querySelector(".iMaking").value = it.making;
+      div.querySelector(".iCode").style.background = "#eef7ee";
+    } else {
+      div.querySelector(".iCode").style.background = "";
+    }
+    calculate();
+  });
   $("items").appendChild(div);
 }
 function getItems(){
@@ -514,8 +612,12 @@ function getItems(){
     const s = parseNum(r.querySelector(".iProfit").value);
     const wGram = unit === "mesghal" ? w * MESGHAL : w;
     const raw = p * wGram, ma = raw * m / 100, pa = (raw + ma) * s / 100;
-    return {name: r.querySelector(".iName").value || "کالا", weight: w, wGram: wGram, m: m, s: s, raw: raw, ma: ma, pa: pa, total: raw + ma + pa};
+    return {name: r.querySelector(".iName").value || "کالا", weight: w, wGram: wGram, m: m, s: s, raw: raw, ma: ma, pa: pa, total: raw + ma + pa,
+            code: r.querySelector(".iCode").value.trim() || ""};
   });
+}
+function getItemCodes(){
+  return getItems().map(x => x.code).filter(c => c);
 }
 function itemsData(){
   return [...$("items").children].map(r => ({
@@ -536,7 +638,12 @@ function calculate(){
   const wSum   = items.reduce((a,x) => a + x.wGram, 0);
   const tax = taxOn ? sumMa * tRate / 100 : 0;
   const total = sumRaw + sumMa + sumPa + tax;
-  calc = {items:items, sumRaw:sumRaw, sumMa:sumMa, sumPa:sumPa, tax:tax, total:total, wSum:wSum};
+  const recv = getRecvRows();
+  const recvSum = recv.reduce((a,r) => a + r.amount, 0);
+  const disc = parseNum($("invDisc") ? $("invDisc").value : 0);
+  const payable = Math.max(0, total - recvSum - disc);
+  calc = {items:items, sumRaw:sumRaw, sumMa:sumMa, sumPa:sumPa, tax:tax, total:total, wSum:wSum,
+          recv:recv, recvSum:recvSum, disc:disc, payable:payable};
   $("itemCount").textContent = fmt(items.length);
   $("wEq").textContent = fmtFa(wSum) + " گرم";
   $("raw").textContent = fmt(sumRaw) + " تومان";
@@ -545,11 +652,54 @@ function calculate(){
   $("taxLine").style.display = taxOn ? "flex" : "none";
   $("taxAmount").textContent = fmt(tax) + " تومان";
   $("final").textContent = fmt(total) + " تومان";
+  $("recvLine").style.display = recvSum > 0 ? "flex" : "none";
+  $("recvAmount").textContent = "− " + fmt(recvSum) + " تومان";
+  $("discLine").style.display = disc > 0 ? "flex" : "none";
+  $("discAmount").textContent = "− " + fmt(disc) + " تومان";
+  $("payable").textContent = fmt(payable) + " تومان";
   const rows = [...$("items").children];
   rows.forEach((r,i) => { r.querySelector(".iTag").textContent = items[i] ? ("مبلغ ردیف: " + fmt(items[i].total) + " تومان") : ""; });
   saveState();
   if($("invPanel").classList.contains("on")) renderInvoice();
 }
+
+/* ---------- طلای دریافتی از مشتری ---------- */
+function addRecvRow(data){
+  const d = data || {k:"کارکرده", w:"", r:""};
+  const div = document.createElement("div");
+  div.className = "itemRow";
+  div.innerHTML =
+    '<div class="itemGrid recvGrid">' +
+    '<select class="input rKind">' +
+    '<option value="کارکرده"' + (d.k === "کارکرده" ? " selected" : "") + '>🔧 کارکرده</option>' +
+    '<option value="شکسته"' + (d.k === "شکسته" ? " selected" : "") + '>💔 شکسته</option>' +
+    '<option value="آبشده"' + (d.k === "آبشده" ? " selected" : "") + '>🔥 آبشده</option>' +
+    '</select>' +
+    '<input class="input num rWeight" inputmode="decimal" type="number" min="0" step="0.01" placeholder="وزن (گرم)" value="' + (d.w||"") + '">' +
+    '<input class="input num rRate" inputmode="decimal" type="number" min="0" step="10000" placeholder="نرخ تعویض (تومان/گرم)" value="' + (d.r||"") + '">' +
+    '<div class="iTag rTag"></div>' +
+    '<button class="iDel" title="حذف">🗑️</button>' +
+    '</div>';
+  div.querySelector(".iDel").onclick = () => { div.remove(); calculate(); };
+  [".rKind",".rWeight",".rRate"].forEach(c => div.querySelector(c).addEventListener("input", calculate));
+  div.querySelector(".rKind").addEventListener("change", calculate);
+  $("recvList").appendChild(div);
+  return div;
+}
+function getRecvRows(){
+  const p = parseNum($("price").value);
+  return [...$("recvList").children].map(r => {
+    const kind = r.querySelector(".rKind").value;
+    const w = parseNum(r.querySelector(".rWeight").value);
+    let rate = parseNum(r.querySelector(".rRate").value);
+    if(!rate) rate = p;
+    const amount = Math.round(w * rate);
+    r.querySelector(".rTag").textContent = w ? (kind + " — مبلغ: " + fmt(amount) + " تومان") : "";
+    return {kind:kind, wGram:w, rate:rate, amount:amount};
+  }).filter(r => r.wGram > 0);
+}
+$("addRecv").onclick = () => { addRecvRow(); calculate(); };
+$("invDisc").addEventListener("input", calculate);
 
 /* ---------- ذخیره و بازیابی ---------- */
 function saveState(){
@@ -707,6 +857,10 @@ function renderCustDatalists(){
   const html = keys.map(k => '<option value="' + k + '">' + c[k].name + '</option>').join("");
   $("custList").innerHTML = html;
   $("custList2").innerHTML = html;
+  const stc = jget(STOCK, []).filter(x => x.status !== "فروخته‌شده");
+  const stHtml = stc.map(x => '<option value="' + x.code + '">' + x.name + ' — ' + fmtFa(x.weight) + ' گرم</option>').join("");
+  $("stockCodes").innerHTML = stHtml;
+  $("stockCodes2").innerHTML = jget(STOCK, []).map(x => '<option value="' + x.code + '">' + x.name + '</option>').join("");
   const sel = $("repCust");
   const cur = sel.value;
   sel.innerHTML = '<option value="">— انتخاب کن —</option>' +
@@ -820,10 +974,31 @@ function renderTxList(){
     const val = t.type === "buyGold"
       ? (fmtFa(t.weight) + ' گرم — ' + fmt(t.amount) + ' تومان')
       : fmtFa(t.weight) + ' گرم';
+    const shareBtn = t.type === "buyGold" ? '<button class="txShare">📱 ارسال رسید</button>' : '';
     el.innerHTML =
       '<div class="txTop"><span>' + TX_LABEL[t.type] + ' — ' + ((c[t.phone] || {}).name || t.phone) + '</span><span>' + val + '</span></div>' +
       '<div class="txMeta">' + jdate(t.ts) + (t.note ? ' — ' + t.note : '') + '</div>' +
-      '<div class="arcBtns"><button class="txDel">🗑️ حذف این تراکنش</button></div>';
+      '<div class="arcBtns">' + shareBtn + '<button class="txDel">🗑️ حذف این تراکنش</button></div>';
+    const sh = el.querySelector(".txShare");
+    if(sh) sh.onclick = () => {
+      const name = (c[t.phone] || {}).name || "مشتری";
+      const txt = "🛒 رسید خرید طلا — گالری کهربا\n" +
+        "خریدار: " + name + "\n" +
+        "تاریخ: " + jdate(t.ts) + "\n" +
+        "وزن: " + fmtFa(t.weight) + " گرم\n" +
+        "مبلغ پرداختی: " + fmt(t.amount) + " تومان" +
+        (t.note && t.note.indexOf("📥") < 0 ? "\nتوضیح: " + t.note : "") +
+        "\nبا تشکر از اعتماد شما 🌟";
+      const ph = normPh(t.phone || "");
+      const go = (url) => { if(ph) window.open(url, "_blank", "noopener"); else toast("شماره موبایل مشتری ثبت نشده"); };
+      if(navigator.share){
+        navigator.share({title: "رسید خرید طلا", text: txt}).catch(() => {});
+      } else if(/Android|iPhone/.test(navigator.userAgent) && ph){
+        go("https://wa.me/98" + ph.replace(/^0/, "") + "?text=" + encodeURIComponent(txt));
+      } else {
+        copyText(txt, "متن رسید کپی شد ✓");
+      }
+    };
     el.querySelector(".txDel").onclick = () => {
       if(confirm("این تراکنش حذف شود؟ مانده‌های مرتبط خودکار اصلاح می‌شوند.")){
         jset(TX, jget(TX, []).filter(x => !(x && x.id === t.id)));
@@ -849,7 +1024,9 @@ function invoiceObj(){
     items: calc.items.map(x => ({name: x.name, wGram: x.wGram, m: x.m, s: x.s, total: x.total})),
     sumRaw: calc.sumRaw, sumMa: calc.sumMa, sumPa: calc.sumPa,
     taxOn: $("taxOn").checked, taxRate: parseNum($("taxRate").value),
-    tax: calc.tax, total: calc.total, wSum: calc.wSum
+    tax: calc.tax, total: calc.total, wSum: calc.wSum,
+    recv: calc.recv, recvSum: calc.recvSum, disc: calc.disc, payable: calc.payable,
+    itemCodes: getItemCodes()
   };
 }
 function invTableHtml(o){
@@ -872,11 +1049,14 @@ function invoiceTextFromObj(o){
     "نرخ روز هر گرم ۱۸ عیار: " + fmt(o.price) + " تومان\n" +
     "--------------\n";
   o.items.forEach(x => {
-    t += x.name + " — " + fmtFa(x.wGram) + " گرم — اجرت " + fmtFa(x.m) + "٪ — سود " + fmtFa(x.s) + "٪ — " + fmt(x.total) + " تومان\n";
+    t += x.name + (x.code ? " [" + x.code + "]" : "") + " — " + fmtFa(x.wGram) + " گرم — اجرت " + fmtFa(x.m) + "٪ — سود " + fmtFa(x.s) + "٪ — " + fmt(x.total) + " تومان\n";
   });
   t += "--------------\n";
   if(o.taxOn) t += "مالیات ارزش افزوده: " + fmt(o.tax) + " تومان\n";
-  t += "قیمت نهایی: " + fmt(o.total) + " تومان";
+  t += "قیمت نهایی: " + fmt(o.total) + " تومان\n";
+  if(o.recvSum) t += "📥 کسر طلای دریافتی: " + fmt(o.recvSum) + " تومان\n";
+  if(o.disc) t += "🏷️ تخفیف نقدی: " + fmt(o.disc) + " تومان\n";
+  t += "💰 قابل پرداخت: " + fmt(o.payable !== undefined ? o.payable : o.total) + " تومان";
   return t;
 }
 $("invToggle").onclick = () => {
@@ -896,6 +1076,9 @@ function printObj(o){
     o.items.map(x => '<tr><td>' + x.name + '</td><td>' + fmtFa(x.wGram) + ' گرم</td><td>' + fmtFa(x.m) + '٪</td><td>' + fmtFa(x.s) + '٪</td><td>' + fmt(x.total) + '</td></tr>').join("") +
     (o.taxOn ? '<tr><td colspan="4">مالیات ارزش افزوده (' + fmtFa(o.taxRate) + '٪)</td><td>' + fmt(o.tax) + '</td></tr>' : '') +
     '<tr class="total"><td colspan="4">قیمت نهایی</td><td>' + fmt(o.total) + ' تومان</td></tr>' +
+    (o.recvSum ? '<tr><td colspan="4">📥 کسر طلای دریافتی</td><td>' + fmt(o.recvSum) + ' تومان</td></tr>' : '') +
+    (o.disc ? '<tr><td colspan="4">🏷️ تخفیف نقدی</td><td>' + fmt(o.disc) + ' تومان</td></tr>' : '') +
+    '<tr class="total" style="background:#f4ecd8"><td colspan="4">💰 قابل پرداخت</td><td>' + fmt(o.payable !== undefined ? o.payable : o.total) + ' تومان</td></tr>' +
     '</table>' +
     '<div class="pf">این فاکتور توسط گالری کهربا صادر شده است.</div>';
   window.print();
@@ -914,6 +1097,15 @@ function buildInvoiceHtml(o){
   const taxRow = o.taxOn ?
     '<tr><td colspan="4" style="padding:10px 8px;font-size:14px">مالیات ارزش افزوده (' + fmtFa(o.taxRate) + '٪ روی اجرت)</td>' +
     '<td style="padding:10px 8px;font-size:14px;font-weight:800;text-align:left">' + fmt(o.tax) + '</td></tr>' : "";
+  const recvRow = o.recvSum ?
+    '<tr><td colspan="4" style="padding:10px 8px;font-size:14px">📥 کسر طلای دریافتی از مشتری</td>' +
+    '<td style="padding:10px 8px;font-size:14px;font-weight:800;text-align:left;color:#2e7d4f">− ' + fmt(o.recvSum) + '</td></tr>' : "";
+  const discRow = o.disc ?
+    '<tr><td colspan="4" style="padding:10px 8px;font-size:14px">🏷️ تخفیف نقدی</td>' +
+    '<td style="padding:10px 8px;font-size:14px;font-weight:800;text-align:left;color:#9d2c2c">− ' + fmt(o.disc) + '</td></tr>' : "";
+  const payRow =
+    '<tr style="background:#f4ecd8"><td colspan="4" style="padding:12px 8px;font-size:16px;font-weight:900;color:#20190f">💰 قابل پرداخت</td>' +
+    '<td style="padding:12px 8px;font-size:17px;font-weight:900;text-align:left;color:#8a6d1a">' + fmt(o.payable !== undefined ? o.payable : o.total) + '</td></tr>';
   return '' +
   '<div style="background:linear-gradient(135deg,#141414,#2b2620);border-radius:0 0 26px 26px;padding:20px 20px 16px;text-align:center;color:#f2df9b">' +
     '<div style="transform:scale(0.8);transform-origin:top center">' + LOGO_SVG + '</div>' +
@@ -935,13 +1127,14 @@ function buildInvoiceHtml(o){
       '</tr></thead><tbody>' + rows + taxRow +
       '<tr style="background:#f4ecd8"><td colspan="4" style="padding:12px 8px;font-size:16px;font-weight:900;color:#20190f">قیمت نهایی</td>' +
       '<td style="padding:12px 8px;font-size:17px;font-weight:900;text-align:left;color:#8a6d1a">' + fmt(o.total) + '</td></tr>' +
+      recvRow + discRow + payRow +
     '</tbody></table>' +
     '<div style="margin-top:14px;text-align:center;font-size:11.5px;color:#999999">این فاکتور توسط گالری کهربا صادر شده است — با تشکر از اعتماد شما 🌟</div>' +
   '</div>';
 }
 async function invoiceImage(o){
   const W = 720;
-  const H = Math.max(900, 480 + o.items.length * 46 + (o.taxOn ? 50 : 0));
+  const H = Math.max(900, 480 + o.items.length * 46 + (o.taxOn ? 50 : 0) + (o.recvSum ? 50 : 0) + (o.disc ? 50 : 0) + 60);
   const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '">' +
     '<foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" style="width:' + W + 'px;height:' + H + 'px;background:#fffaf0;direction:rtl;font-family:Tahoma,Arial,sans-serif;color:#20190f">' +
     buildInvoiceHtml(o) + '</div></foreignObject></svg>';
@@ -1023,8 +1216,17 @@ $("cPhone").addEventListener("input", () => {
 
 /* ---------- آرشیو ---------- */
 function renderArchive(){
-  const a = jget(ARC, []), list = $("archiveList");
-  if(!a.length){ list.innerHTML = '<p class="note">هنوز فاکتوری ثبت نشده است.</p>'; return; }
+  const all = jget(ARC, []), list = $("archiveList");
+  if(!all.length){ list.innerHTML = '<p class="note">هنوز فاکتوری ثبت نشده است.</p>'; return; }
+  const q = fa2en($("arcSearch") ? $("arcSearch").value.trim() : "").toLowerCase();
+  const a = q ? all.filter(o =>
+    (o.customer || "").toLowerCase().includes(q) ||
+    String(Math.round(safe(o.total))).includes(q) ||
+    fa2en(jday(o.ts)).includes(q) ||
+    (o.items || []).some(i => (i.name || "").toLowerCase().includes(q)) ||
+    (o.items || []).some(i => (i.code || "").toLowerCase().includes(q))
+  ) : all;
+  if(!a.length){ list.innerHTML = '<p class="note">چیزی مطابق جستجو پیدا نشد.</p>'; return; }
   list.innerHTML = "";
   a.slice().reverse().forEach(o => {
     const div = document.createElement("div");
@@ -1054,11 +1256,12 @@ function renderArchive(){
     list.appendChild(div);
   });
 }
+$("arcSearch").addEventListener("input", renderArchive);
 $("arcWipe").onclick = () => {
   if(confirm("کل آرشیو پاک شود؟ حسابداری هم بدون فروش‌ها می‌شود.")){ jset(ARC, []); renderArchive(); renderFinance(); toast("آرشیو پاک شد"); }
 };
 $("invArchive").onclick = () => {
-  if(!calc.items.length || calc.total <= 0){ toast("اول اقلام فاکتور را وارد کنید"); return; }
+  if(!calc.items.length || calc.payable <= 0){ toast("اول اقلام فاکتور را وارد کنید"); return; }
   const o = invoiceObj();
   const a = jget(ARC, []);
   a.push(o);
@@ -1072,9 +1275,121 @@ $("invArchive").onclick = () => {
     saveCust(c);
     renderCustDatalists(); renderCustList();
   }
+  if(o.recv && o.recv.length){
+    const txs = jget(TX, []);
+    o.recv.forEach((r, i) => txs.push({id: o.id + i + 1, ts: o.ts, type: "buyGold",
+      phone: o.phone || "", weight: safe(r.wGram), amount: safe(r.amount),
+      note: "📥 دریافتی فاکتور — " + r.kind + " (نرخ " + fmt(r.rate) + ")"}));
+    jset(TX, txs);
+    renderTxList();
+  }
+  if(o.itemCodes && o.itemCodes.length){
+    const st = jget(STOCK, []);
+    o.itemCodes.forEach(code => {
+      const it = st.find(x => x.code === code);
+      if(it){ it.status = "فروخته‌شده"; it.soldTs = o.ts; it.soldTo = o.customer; }
+    });
+    jset(STOCK, st);
+    renderStock();
+  }
   renderArchive();
   renderFinance();
   toast("فاکتور در آرشیو و حسابداری ثبت شد ✓");
+};
+
+/* ---------- انبار ---------- */
+function nextStockCode(){
+  const st = jget(STOCK, []);
+  let n = st.length + 1;
+  const exists = c => st.some(x => x.code === c);
+  let c;
+  do{ c = "K-" + String(n).padStart(3, "0"); n++; }while(exists(c) && n < 9999);
+  return c;
+}
+$("stSave").onclick = () => {
+  const w = parseNum($("stWeight").value);
+  if(w <= 0){ toast("وزن جنس را وارد کنید"); return; }
+  const st = jget(STOCK, []);
+  let code = $("stCode").value.trim();
+  if(code && st.some(x => x.code === code)){ toast("این کد قبلاً استفاده شده — کد دیگری بزن"); return; }
+  if(!code) code = nextStockCode();
+  st.push({id: Date.now(), code: code, name: $("stName").value.trim() || "بدون شرح",
+           kind: $("stKind").value, weight: w, making: parseNum($("stMaking").value),
+           inTs: Date.now(), status: "موجود"});
+  jset(STOCK, st);
+  $("stCode").value = ""; $("stName").value = ""; $("stWeight").value = ""; $("stMaking").value = "";
+  renderStock(); renderCustDatalists();
+  toast("جنس با کد " + code + " در انبار ثبت شد ✓");
+};
+let stFilter = "همه";
+document.querySelectorAll("#stChips button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("#stChips button").forEach(x => x.classList.remove("on"));
+  b.classList.add("on");
+  stFilter = b.dataset.k;
+  renderStock();
+});
+$("stSearch").addEventListener("input", renderStock);
+function renderStock(){
+  const st = jget(STOCK, []);
+  const q = fa2en($("stSearch").value.trim()).toLowerCase();
+  const KIND_ICON = {"نو": "✨", "کارکرده": "🔧", "شکسته": "💔", "آبشده": "🔥", "فروخته‌شده": "✅"};
+  const sums = {"نو": 0, "کارکرده": 0, "شکسته": 0, "آبشده": 0};
+  let soldW = 0;
+  st.forEach(x => {
+    if(x.status === "فروخته‌شده") soldW += safe(x.weight);
+    else if(sums[x.kind] !== undefined) sums[x.kind] += safe(x.weight);
+  });
+  $("stSummary").innerHTML =
+    '<div class="dash" style="margin-bottom:10px">' +
+    Object.keys(sums).map(k => '<div class="dashBox"><div class="v">' + fmtFa(sums[k]) + '</div><div class="l">' + KIND_ICON[k] + ' ' + k + ' (گرم)</div></div>').join("") +
+    '<div class="dashBox"><div class="v">' + fmtFa(soldW) + '</div><div class="l">✅ فروخته‌شده (گرم)</div></div>' +
+    '<div class="dashBox"><div class="v">' + fmt(st.length) + '</div><div class="l">تعداد کل اقلام</div></div>' +
+    '</div>';
+  const rows = st.filter(x =>
+    (stFilter === "همه" || x.status === stFilter || (stFilter !== "فروخته‌شده" && x.kind === stFilter)) &&
+    (!q || (x.code||"").toLowerCase().includes(q) || (x.name||"").toLowerCase().includes(q) || fa2en(String(x.weight)).includes(q))
+  ).sort((a,b) => b.inTs - a.inTs);
+  const div = $("stockList");
+  if(!rows.length){ div.innerHTML = '<p class="note">جنسی مطابق این فیلتر پیدا نشد.</p>'; return; }
+  div.innerHTML = "";
+  rows.forEach(x => {
+    const el = document.createElement("div");
+    el.className = "arcItem";
+    el.innerHTML =
+      '<div class="arcTop"><span>' + (KIND_ICON[x.kind] || "") + ' <b>' + fa2en(x.code) + '</b> — ' + escHtml(x.name) + '</span><span>' + fmtFa(x.weight) + ' گرم</span></div>' +
+      '<div class="arcMeta">' + x.kind + ' — اجرت ' + fmtFa(x.making) + '٪ — ورود: ' + jday(x.inTs) +
+      (x.status === "فروخته‌شده" ? ' — ✅ فروخته‌شده به ' + escHtml(x.soldTo || "—") + ' در ' + jday(x.soldTs) : '') + '</div>' +
+      (x.status !== "فروخته‌شده" ?
+        '<div class="arcBtns"><button class="btn clearbtn stDel">🗑️ حذف از انبار</button></div>' : '');
+    const del = el.querySelector(".stDel");
+    if(del) del.onclick = () => {
+      if(confirm("جنس " + x.code + " از انبار حذف شود؟")){
+        jset(STOCK, jget(STOCK, []).filter(y => y.id !== x.id));
+        renderStock(); renderCustDatalists();
+        toast("جنس حذف شد");
+      }
+    };
+    div.appendChild(el);
+  });
+}
+$("stPrint").onclick = () => {
+  const st = jget(STOCK, []);
+  const avail = st.filter(x => x.status !== "فروخته‌شده");
+  const KIND_ICON = {"نو": "✨", "کارکرده": "🔧", "شکسته": "💔", "آبشده": "🔥"};
+  const sums = {};
+  avail.forEach(x => { sums[x.kind] = (sums[x.kind] || 0) + safe(x.weight); });
+  $("printArea").innerHTML =
+    '<div style="text-align:center">' + LOGO_SVG.replace('width="260" height="84"','width="200" height="65"') + '</div>' +
+    '<h2 style="margin:0 0 4px">لیست موجودی انبار</h2>' +
+    '<div class="ph">' + jday(Date.now()) + ' — ' + avail.length + ' قلم موجود</div>' +
+    '<table><tr><th>کد</th><th>شرح</th><th>نوع</th><th>وزن</th><th>اجرت</th><th>تاریخ ورود</th></tr>' +
+    avail.sort((a,b) => (a.code||"").localeCompare(b.code||"")).map(x =>
+      '<tr><td>' + fa2en(x.code) + '</td><td>' + escHtml(x.name) + '</td><td>' + (KIND_ICON[x.kind]||"") + ' ' + x.kind + '</td><td>' + fmtFa(x.weight) + ' گرم</td><td>' + fmtFa(x.making) + '٪</td><td>' + jday(x.inTs) + '</td></tr>'
+    ).join("") +
+    '</table>' +
+    Object.keys(sums).map(k => '<div class="sec">' + k + ': ' + fmtFa(sums[k]) + ' گرم</div>').join("") +
+    '<div class="pf">این لیست توسط گالری کهربا صادر شده است.</div>';
+  window.print();
 };
 
 /* ---------- حسابداری ---------- */
@@ -1440,6 +1755,47 @@ document.querySelectorAll("#repChips button").forEach(b => b.onclick = () => {
 });
 $("repCust").addEventListener("change", () => buildCustReport($("repCust").value));
 $("repOPrint").onclick = printOverall;
+$("profitCopy").onclick = () => {
+  const d = monthlyProfits();
+  let t = "📊 سود ماهانه — گالری کهربا\n";
+  d.forEach(m => { t += m.label + ": سود " + fmt(m.profit) + " تومان — فروش " + fmt(m.sales) + " تومان\n"; });
+  copyText(t, "جدول اعداد کپی شد ✓");
+};
+function monthlyProfits(){
+  const invs = jget(ARC, []);
+  const now = new Date();
+  const months = [];
+  for(let i = 5; i >= 0; i--){
+    const d0 = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const d1 = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+    const mine = invs.filter(o => o.ts >= d0.getTime() && o.ts < d1.getTime());
+    let lbl;
+    try{ lbl = new Intl.DateTimeFormat("fa-IR", {month: "long"}).format(d0); }catch(e){ lbl = String(d0.getMonth() + 1); }
+    months.push({
+      label: lbl,
+      profit: mine.reduce((a,o) => a + safe(o.sumPa), 0),
+      sales: mine.reduce((a,o) => a + safe(o.total), 0),
+      count: mine.length
+    });
+  }
+  return months;
+}
+function buildProfitChart(){
+  const data = monthlyProfits();
+  const maxV = Math.max(1, ...data.map(m => m.profit));
+  const bars = data.map(m => {
+    const h = Math.round(m.profit / maxV * 120);
+    return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">' +
+      '<div style="font-size:9.5px;font-weight:800;color:#8a6d1a">' + (m.profit ? fmt(m.profit / 1e6) + " م" : "—") + '</div>' +
+      '<div style="width:70%;max-width:44px;height:' + Math.max(4, h) + 'px;background:linear-gradient(180deg,#e3c04a,#c9a227);border-radius:6px 6px 0 0"></div>' +
+      '<div style="font-size:10px;font-weight:700;color:#7a6a45">' + m.label + '</div>' +
+      '<div style="font-size:9px;color:#999">' + fmt(m.count) + ' فاکتور</div>' +
+      '</div>';
+  }).join("");
+  $("profitChart").innerHTML =
+    '<div style="display:flex;align-items:flex-end;gap:6px;height:190px;padding:0 4px">' + bars + '</div>' +
+    '<div class="unit" style="text-align:center;margin-top:6px">ارتفاع میله = سود ماه (م = میلیون تومان)</div>';
+}
 $("repOCopy").onclick = () => copyText(overallText(), "گزارش کپی شد ✓");
 $("repOShare").onclick = async () => {
   if(navigator.share){ try{ await navigator.share({title: "گزارش گالری کهربا", text: overallText()}); }catch(e){} }
@@ -1467,9 +1823,9 @@ $("repCWa").onclick = () => {
 };
 
 /* ---------- پشتیبان‌گیری و بازیابی ---------- */
-const BK_KEYS = [STORE, STORE + "_meta", STORE + "_apikey", STORE + "_auto", STORE + "_dbg", ARC, CUST, TX, EXP, FIN];
+const BK_KEYS = [STORE, STORE + "_meta", STORE + "_apikey", STORE + "_auto", STORE + "_dbg", ARC, CUST, TX, EXP, FIN, STOCK];
 $("bkExport").onclick = () => {
-  const data = {app: "kahroba", ver: 7, ts: Date.now(), data: {}};
+  const data = {app: "kahroba", ver: 9, ts: Date.now(), data: {}};
   BK_KEYS.forEach(k => {
     const v = localStorage.getItem(k);
     if(v !== null) data.data[k] = v;
@@ -1573,6 +1929,9 @@ renderTxList();
 renderExpList();
 renderFinance();
 buildOverall();
+buildProfitChart();
+addRecvRow();
+renderStock();
 </script>
  </body>
 </html>
